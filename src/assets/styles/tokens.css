@@ -1,0 +1,54 @@
+:root {
+  /* ---- Core palette (sampled from banner.webp) ---- */
+  --white: #ffffff;
+  --ink: #1a1a1a;
+  --yellow: #fdf254; /* rgb(253,242,84) — the wordmark highlight */
+
+  /* Slight shades */
+  --yellow-deep: #f2e12a; /* hover / active accent */
+  --yellow-soft: #fefad0; /* wash / tints */
+  --ink-2: #3a3a3a; /* secondary text */
+  --ink-3: #6b6b6b; /* muted text */
+  --line: #e7e7e5; /* hairlines / borders */
+  --line-strong: #1a1a1a;
+  --paper: #faf9f6; /* off-white section band */
+  --paper-2: #f2f1ec;
+
+  /* Orange — reserved for the device keycaps/hardware only */
+  --orange: #f26a1b;
+  --orange-deep: #d8560c;
+  --orange-soft: #ff8a3d;
+
+  /* ---- Typography ----
+     'Outfit' covers Latin; it has no Cyrillic, so 'Onest' (a close geometric
+     match) sits right behind it and serves Cyrillic glyphs per-character. */
+  --font-display: 'Outfit', 'Onest', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: 'Outfit', 'Onest', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'JetBrains Mono', 'Menlo', monospace;
+
+  /* Fluid type scale */
+  --fs-display: clamp(2.75rem, 1.4rem + 6vw, 6rem);
+  --fs-h1: clamp(2.1rem, 1.3rem + 3.6vw, 3.9rem);
+  --fs-h2: clamp(1.6rem, 1.1rem + 2.2vw, 2.6rem);
+  --fs-h3: clamp(1.2rem, 1rem + 0.9vw, 1.5rem);
+  --fs-lead: clamp(1.05rem, 0.98rem + 0.5vw, 1.3rem);
+  --fs-body: 1rem;
+  --fs-sm: 0.875rem;
+  --fs-xs: 0.75rem;
+
+  /* ---- Spacing / layout ---- */
+  --maxw: 74rem;
+  --maxw-narrow: 52rem;
+  --gutter: clamp(1.25rem, 0.5rem + 3vw, 3rem);
+  --section-y: clamp(4rem, 2rem + 8vw, 8rem);
+
+  --radius: 14px;
+  --radius-lg: 22px;
+  --radius-sm: 8px;
+
+  --shadow-sm: 0 1px 2px rgba(26, 26, 26, 0.06);
+  --shadow: 0 8px 30px rgba(26, 26, 26, 0.08);
+  --shadow-lg: 0 24px 60px rgba(26, 26, 26, 0.12);
+
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}

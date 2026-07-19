@@ -1,0 +1,12 @@
+{
+  "name": "J++Device",
+  "short_name": "J++Device",
+  "description": "A tiny, open, pocket-sized ESP32-C6 handheld you write your own apps for.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" }
+  ]
+}

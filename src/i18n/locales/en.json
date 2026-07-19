@@ -1,0 +1,230 @@
+{
+  "common": {
+    "brandHome": "J++ Device — home",
+    "githubLabel": "GitHub",
+    "soon": "Soon"
+  },
+  "nav": {
+    "what": "What is it",
+    "apps": "Apps",
+    "developers": "Developers",
+    "specs": "Specs",
+    "openSource": "Open source",
+    "getOne": "Get one",
+    "toggleMenu": "Toggle menu"
+  },
+  "footer": {
+    "blurb": "A tiny, open, pocket-sized computer you write your own apps for. Hand-built limited run — not for sale.",
+    "madeBy": "{os} {fw} · firmware ~90% vibecoded by <strong>Claude</strong> (Opus 4.8 + Fable 5) with m4l3vich.",
+    "builtBy": "Built by {makers}",
+    "cols": {
+      "openSource": "Open source",
+      "roadmap": "Roadmap",
+      "thisPage": "This page"
+    },
+    "links": {
+      "firmware": "JPPDOS firmware",
+      "appDocs": "App developer docs",
+      "cad": "Enclosure CAD",
+      "meshtastic": "Meshtastic port",
+      "webFlasher": "Web flasher",
+      "webUi": "Management Web UI",
+      "what": "What is it",
+      "developers": "For developers",
+      "getOne": "How to get one"
+    }
+  },
+  "hero": {
+    "tagline": "Is it a game? A beeper? A hacker's multitool? All of it, actually — and more.",
+    "lead": "J++Device is a tiny hackable handheld you can write apps for. It's based on ESP32-C6 Super Mini soldered to a custom mainboard and has a keypad, small monochrome OLED, an SD card, RTC and LoRA modules. It also has a custom firmware for it called {strongStart}JPPDOS{strongEnd}.",
+    "scarceBar": "There are 20 hand-built units",
+    "scarceRest": "that were handed out during J++Meetup 2026 in Moscow. You can build your own device, though.",
+    "ctaBuild": "Sources on GitHub",
+    "caption": "128×64 OLED · 5 buttons · 512KB SRAM"
+  },
+  "whatIsIt": {
+    "eyebrow": "What is it",
+    "title": "Everything you can wish for.",
+    "lead": "Well, almost. You can make it do everything it's able to.",
+    "features": {
+      "open": {
+        "title": "DIY and customise it.",
+        "body": "{strongStart}All CAD files and firmware sources are out there.{strongEnd} You can make a better LoRA antenna, a better enclosure or print it in your favourite colour. Make an app to control your PC or a smart light or a vibe coding agent. Have at it!"
+      },
+      "radio": {
+        "title": "Make it a Meshtastic node.",
+        "body": "Not a fan of DIYing stuff? {strongStart}Flash Meshtastic firmware and use it like that.{strongEnd} Times are rough now so it may come in handy."
+      },
+      "game": {
+        "title": "Play games on it?",
+        "body": "It ain't got no AAA games on it, but if you're bored you can {strongStart}play some Tetris or Pong.{strongEnd} If you have the mad luck to be around an another J++Device user you can {strongStart}play multiplayer Battleships!{strongEnd}"
+      }
+    }
+  },
+  "specs": {
+    "eyebrow": "Specs",
+    "title": "Small, monochrome, and hackable on purpose.",
+    "lead": "The signature look is real, not styling: a see-through PETG shell over visible electronics, a 1-bit OLED, and orange keycaps as the one pop of colour.",
+    "table": {
+      "processor": { "part": "SoC", "detail": "ESP32-C6 — RISC-V, single-core, 512KB SRAM" },
+      "screen": { "part": "Screen", "detail": "128×64 0.96\" monochrome OLED (SSD1306)" },
+      "input": { "part": "Input", "detail": "5-way directional pad — up / down / left / right + center" },
+      "storage": { "part": "Storage", "detail": "128 MB microSD card included (apps + data) · internal flash for settings" },
+      "clock": { "part": "Clock", "detail": "Battery-backed DS1307 real-time clock" },
+      "sound": { "part": "Sound", "detail": "Passive piezo buzzer (PC speaker) — tones, tunes, selectable startup jingles" },
+      "radio": { "part": "Radio", "detail": "Wi-Fi 6, Bluetooth 5 LE, Zigbee, Thread, plus ESP-NOW device-to-device" },
+      "radioExtra": { "part": "Radio (extra)", "detail": "868 MHz LoRa transceiver on board — used by the upcoming Meshtastic port" },
+      "connection": { "part": "Connection", "detail": "Single USB-C port — charging, flashing, and host tools" },
+      "power": { "part": "Power", "detail": "1000 mAh Li-Po (102050) with on-device battery percentage and a physical battery kill-switch to prevent degradation." },
+      "enclosure": { "part": "Enclosure", "detail": "3D-printed transparent PETG shell with orange PLA keycaps — internals visible." }
+    }
+  },
+  "openSource": {
+    "eyebrow": "Open source ecosystem",
+    "title": "One open device. Two different firmwares. Endless hacking.",
+    "lead": "Everything is public — firmware, docs, and the enclosure CAD. Openness is the pitch: the site points outward to GitHub, not inward to a store.",
+    "caption": "The same hardware becomes a pocket multitool or a LoRa mesh node — right from your browser, once the web flasher lands.",
+    "statusSoon": "Soon",
+    "statusShipping": "Shipping",
+    "statusNow": "Now",
+    "firmwares": {
+      "jppdos": {
+        "name": "JPPDOS",
+        "role": "J++Device Operating System",
+        "body1": "The operating system this whole page is about: a launcher, sandboxed apps, games, the demoscene, and the full SDK.",
+        "body": "A firmware based on ESP-IDF intended to run apps that make full use of the available hardware through App SDK. Has a few built-in apps: Games, Fable Demoscene, MeetApp."
+      },
+      "meshtastic": {
+        "name": "Meshtastic port",
+        "role": "LoRa mesh node",
+        "body": "A second firmware that lights up the on-board 868 MHz LoRa radio for long-range mesh messaging. Same hardware, flash a different firmware, become a mesh communicator."
+      }
+    },
+    "roadmap": {
+      "firmware": {
+        "name": "JPPDOS firmware",
+        "body": "Full open source for the operating system — launcher, apps, SDK, and all built-ins."
+      },
+      "docs": {
+        "name": "App developer docs",
+        "body": "Platform overview, MicroPython and native-C guides, manifest reference, and a complete SDK reference."
+      },
+      "cad": {
+        "name": "Enclosure CAD",
+        "body": "All 3D-printable case files (Autodesk Fusion) — print the transparent shell and orange keycaps yourself."
+      },
+      "meshtastic": {
+        "name": "Meshtastic port",
+        "body": "A LoRa mesh firmware for the same hardware. Sources will be on GitHub."
+      },
+      "web_flasher": {
+        "name": "Web flasher",
+        "body": "Install JPPDOS, the Meshtastic port, or a custom firmware from your browser over USB — no toolchain."
+      },
+      "web_ui": {
+        "name": "Management Web UI",
+        "body": "A JPPD-SMP web app to manage a connected device — SD files, device info, time sync — from the browser."
+      }
+    }
+  },
+  "apps": {
+    "eyebrow": "Built-in apps",
+    "title": "Loaded and ready on first boot.",
+    "lead": "Nine games, an oldskool megademo, contact exchange, a Wi-Fi file drive — all in the launcher out of the box. This hardware is meant to be seen.",
+    "gamesTitle": "Games",
+    "gamesCount": "9 · high scores saved",
+    "moreLabel": "Also on board",
+    "multiplayerTitle": "Two-device multiplayer over Bluetooth",
+    "multiplayerBadge": "2P",
+    "demosceneNote": "8 scenes · sine scrolltext · 4×4 Bayer dither · looping chiptune",
+    "items": {
+      "games": {
+        "name": "Games",
+        "tag": "9 · high scores saved",
+        "body": "A hub of nine games loaded on demand — Tetris, Pong, Snake, and more. Several play two-device multiplayer over Bluetooth, and per-game high scores are saved."
+      },
+      "demoscene": {
+        "name": "Demoscene",
+        "tag": "Pure retro flex",
+        "body": "An oldskool megademo made {strongStart}entirely by Claude Fable 5{strongEnd}. 8 auto-cycling scenes — 3D starfield, plasma, rotozoomer, tunnel, wireframe cube, doom-fire and raster-bar credits — plus a sine-wave scrolltext and a looping chiptune. All integer math on a 1-bit screen."
+      },
+      "meetapp": {
+        "name": "MeetApp",
+        "tag": "Bluetooth",
+        "body": "Exchange contact identities with another J++Device over Bluetooth, backed by real Ed25519 cryptographic identity."
+      },
+      "webdav": {
+        "name": "WebDAV server",
+        "tag": "Wi-Fi",
+        "body": "Turn the device into a Wi-Fi file drive to move files on and off the SD card straight from your computer."
+      },
+      "settings": {
+        "name": "Settings",
+        "tag": "System",
+        "body": "Wi-Fi, NTP time, sleep timers, sound and startup jingle, backup/restore, factory reset, user name, and a single-app kiosk lock mode."
+      },
+      "sdk_test": {
+        "name": "SDK Test apps",
+        "tag": "MicroPython + C",
+        "body": "Two live demos — one MicroPython, one native C — that exercise every SDK call. The fastest way to see the whole API in action on real hardware."
+      }
+    }
+  },
+  "developers": {
+    "eyebrow": "For app developers",
+    "titlePre": "There's an app for that!",
+    "titleHighlight": "Make your own one today.",
+    "lead": "Write it in MicroPython or native C, drop the folder on the SD card, and it shows up in the launcher. Here's a complete clock app — the same program, both languages.",
+    "hint": "manifest.json + one entry file per app · ~21 chars × 7 lines of text, plus a full pixel canvas",
+    "sdkGlance": "The SDK, at a glance",
+    "sandboxTitle": "Sandboxed by default",
+    "sdkReference": "SDK reference",
+    "firmwareRepo": "Firmware repo",
+    "madeBy": "{os} was <strong>~90% vibecoded by Claude</strong> (Opus&nbsp;4.8&nbsp;+&nbsp;Fable&nbsp;5), together with m4l3vich — the firmware, the SDK, the built-in apps, and this demoscene. You can vibecode some stuff too!",
+    "sdkGroups": {
+      "appControl": "App control",
+      "keyInput": "Key input",
+      "canvas": "Canvas",
+      "uiHelpers": "UI helpers",
+      "soundLight": "Sound & light",
+      "deviceStatus": "Device status",
+      "storage": "Storage",
+      "comms": "Comms"
+    },
+    "tiers": {
+      "noPermission": {
+        "tier": "No permission",
+        "body": "Drawing, input, buzzer, LED, the key-value store, IPC, and device status all work with nothing to declare."
+      },
+      "prompted": {
+        "tier": "Prompted once, deny-safe",
+        "body": "Internet access, Bluetooth, background execution, and full-SD access ask the user the first time they are used — and can be denied without crashing the app."
+      }
+    }
+  },
+  "getOne": {
+    "eyebrow": "How to get one",
+    "title": "You get it or you make it.",
+    "lead": "The J++Device isn't and never will be sold.",
+    "way1Title": "Build your own",
+    "way1Body": "Print the transparent shell and orange keycaps from the published CAD, source the parts, and flash JPPDOS over USB-C. Everything you need — firmware, docs, and case files — is on GitHub.",
+    "way1Cta": "Get the CAD & firmware",
+    "way2Title": "Get one at J++Meetup",
+    "way2Body": "m4l3vich handed out 20 hand-built units in person to the J++ community and friends at {meetup} in {city}. Each unit is numbered and carries a signed, write-once identity chip.",
+    "dateTba": "Date TBA",
+    "provLabel": "Limited Run Verification",
+    "provUnitPrefix": "unit",
+    "provBody": "Each handed-out unit proves it's a genuine numbered piece from an on-device verification mechanism — a signed Ed25519 identity that survives factory reset and reflashing. The identity can be verified through a serial connection or online.",
+    "verifyCta": "Verify a device"
+  },
+  "site": {
+    "meetupCity": "Moscow"
+  },
+  "codeBlock": {
+    "copy": "Copy",
+    "copied": "Copied"
+  },
+  "oled": {
+    "ariaLabel": "A 128×64 monochrome OLED running the J++Device demoscene."
+  }
+}
