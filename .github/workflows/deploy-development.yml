@@ -1,0 +1,67 @@
+name: Deploy to Yandex Cloud S3
+
+# Builds the app and uploads the built static bundle (dist/) to an
+# S3-compatible bucket. Credentials/variables live in the GitHub
+# "development" deployment environment (see the tutorial in CLAUDE.md /
+# the PR description). The bucket is Yandex Object Storage by default, but
+# any S3-compatible endpoint works.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Only one development deploy at a time; cancel an in-flight run when a newer
+# commit lands.
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    # GitHub deployment environment named "development" — holds the Object
+    # Storage secrets/variables and any protection rules for this target.
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        # A real checkout (not a shallow blob-less one) so the build can read
+        # the commit id via `git rev-parse --short HEAD` (vite.config.ts injects
+        # it into the dev bar as __COMMIT_ID__).
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        # `npm run build` = vue-tsc typecheck + vite build → dist/. This is a
+        # production-mode Vite build, so the dev bar shows the build time +
+        # commit id (its build-info is gated on import.meta.env.PROD).
+        run: npm run build
+
+      - name: Upload dist to Object Storage (S3-compatible)
+        env:
+          # Static access key for the bucket (see tutorial). The AWS CLI v2,
+          # preinstalled on the runner, reads these standard variable names.
+          AWS_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
+          # Yandex Object Storage region; override via the env variable if needed.
+          AWS_DEFAULT_REGION: ${{ vars.S3_REGION || 'ru-central1' }}
+          S3_BUCKET: ${{ vars.S3_BUCKET }}
+          S3_ENDPOINT: ${{ vars.S3_ENDPOINT || 'https://storage.yandexcloud.net' }}
+        run: |
+          if [ -z "$S3_BUCKET" ]; then
+            echo "::error::S3_BUCKET variable is not set in the 'development' environment."
+            exit 1
+          fi
+          aws s3 sync dist/ "s3://${S3_BUCKET}/" \
+            --endpoint-url "$S3_ENDPOINT" \
+            --delete \
+            --no-progress
