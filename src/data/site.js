@@ -31,11 +31,10 @@ export const site = {
 
   // External links — all PLACEHOLDER GitHub URLs until the owner provides real ones.
   links: {
-    githubOrg: 'https://github.com/jppdevice',
-    firmware: 'https://github.com/jppdevice/jppdos',
-    appDocs: 'https://github.com/jppdevice/jppdos/tree/main/docs',
-    cad: 'https://github.com/jppdevice/hardware',
-    meshtastic: 'https://github.com/jppdevice/meshtastic-port',
+    firmware: 'https://github.com/jppteam/jppdos',
+    appDocs: 'https://github.com/jppteam/jppdos/tree/master/docs',
+    cad: 'https://github.com/jppteam/jppdevice-cad',
+    meshtastic: 'https://github.com/jppteam/meshtastic-port',
     webFlasher: '#', // ships later (roadmap)
     webUi: '#', // ships later (roadmap)
     verify: '#', // Limited Run verification page — ships later (roadmap)
