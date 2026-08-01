@@ -13,7 +13,6 @@ const specs = [
   'clock',
   'sound',
   'radio',
-  'radioExtra',
   'connection',
   'power',
   'enclosure',

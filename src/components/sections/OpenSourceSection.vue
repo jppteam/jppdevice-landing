@@ -7,11 +7,9 @@ import { site } from '../../data/site.js'
 
 const { t } = useI18n()
 
-// One open device, multiple firmwares. Flip `status` to 'shipped' when a port
-// lands. Copy lives in i18n under openSource.firmwares.<id>.
+// Copy lives in i18n under openSource.firmwares.<id>.
 const firmwares = [
   { id: 'jppdos', status: 'shipped', link: site.links.firmware },
-  { id: 'meshtastic', status: 'soon', link: site.links.meshtastic },
 ]
 
 // Ecosystem roadmap. Copy lives in i18n under openSource.roadmap.<id> (hyphens
@@ -20,7 +18,6 @@ const roadmap = [
   { id: 'firmware', status: 'shipped', link: site.links.firmware },
   { id: 'docs', status: 'shipped', link: site.links.appDocs },
   { id: 'cad', status: 'shipped', link: site.links.cad },
-  { id: 'meshtastic', status: 'soon', link: site.links.meshtastic },
   { id: 'web-flasher', status: 'soon', link: site.links.webFlasher },
   { id: 'web-ui', status: 'soon', link: site.links.webUi },
 ]
@@ -29,7 +26,6 @@ const iconFor = {
   firmware: 'chip',
   docs: 'code',
   cad: 'open',
-  meshtastic: 'radio',
   'web-flasher': 'flash',
   'web-ui': 'browser',
 }
@@ -89,7 +85,7 @@ const key = (id) => id.replace(/-/g, '_')
 <style scoped>
 .fw {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 1.25rem;
   margin-bottom: 2.5rem;
 }

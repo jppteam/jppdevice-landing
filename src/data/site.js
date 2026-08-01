@@ -34,7 +34,6 @@ export const site = {
     firmware: 'https://github.com/jppteam/jppdos',
     appDocs: 'https://github.com/jppteam/jppdos/tree/master/docs',
     cad: 'https://github.com/jppteam/jppdevice-cad',
-    meshtastic: 'https://github.com/jppteam/meshtastic-port',
     webFlasher: '#', // ships later (roadmap)
     webUi: '#', // ships later (roadmap)
     verify: '#', // Limited Run verification page — ships later (roadmap)

@@ -5,8 +5,8 @@ import IconGlyph from '../IconGlyph.vue'
 
 const { t } = useI18n()
 
-// Icon + order for the three-up; copy lives in i18n under whatIsIt.features.<icon>.
-const features = [{ icon: 'open' }, { icon: 'radio' }, { icon: 'game' }]
+// Icon + order for the cards; copy lives in i18n under whatIsIt.features.<icon>.
+const features = [{ icon: 'open' }, { icon: 'game' }]
 </script>
 
 <template>
@@ -30,8 +30,10 @@ const features = [{ icon: 'open' }, { icon: 'radio' }, { icon: 'game' }]
 <style scoped>
 .grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.25rem;
+  max-width: 56rem;
+  margin-inline: auto;
 }
 .card {
   border: 1px solid var(--line);

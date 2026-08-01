@@ -26,7 +26,6 @@
       "firmware": "JPPDOS firmware",
       "appDocs": "App developer docs",
       "cad": "Enclosure CAD",
-      "meshtastic": "Meshtastic port",
       "webFlasher": "Web flasher",
       "webUi": "Management Web UI",
       "what": "What is it",
@@ -35,8 +34,8 @@
     }
   },
   "hero": {
-    "tagline": "Is it a game? A beeper? A hacker's multitool? All of it, actually — and more.",
-    "lead": "J++Device is a tiny hackable handheld you can write apps for. It's based on ESP32-C6 Super Mini soldered to a custom mainboard and has a keypad, small monochrome OLED, an SD card, RTC and LoRA modules. It also has a custom firmware for it called {strongStart}JPPDOS{strongEnd}.",
+    "tagline": "Is it a game? A beeper? A pocket computer? All of it, actually — and more.",
+    "lead": "J++Device is a tiny open handheld you can write apps for. It's based on ESP32-C6 Super Mini soldered to a custom mainboard and has a keypad, small monochrome OLED, an SD card and an RTC module. It also has a custom firmware for it called {strongStart}JPPDOS{strongEnd}.",
     "scarceBar": "There are 20 hand-built units",
     "scarceRest": "that were handed out during J++Meetup 2026 in Moscow. You can build your own device, though.",
     "ctaBuild": "Sources on GitHub",
@@ -49,11 +48,7 @@
     "features": {
       "open": {
         "title": "DIY and customise it.",
-        "body": "{strongStart}All CAD files and firmware sources are out there.{strongEnd} You can make a better LoRA antenna, a better enclosure or print it in your favourite colour. Make an app to control your PC or a smart light or a vibe coding agent. Have at it!"
-      },
-      "radio": {
-        "title": "Make it a Meshtastic node.",
-        "body": "Not a fan of DIYing stuff? {strongStart}Flash Meshtastic firmware and use it like that.{strongEnd} Times are rough now so it may come in handy."
+        "body": "{strongStart}All CAD files and firmware sources are out there.{strongEnd} You can make a better enclosure or print it in your favourite colour. Make an app to control your PC or a smart light or a vibe coding agent. Have at it!"
       },
       "game": {
         "title": "Play games on it?",
@@ -63,7 +58,7 @@
   },
   "specs": {
     "eyebrow": "Specs",
-    "title": "Small, monochrome, and hackable on purpose.",
+    "title": "Small, monochrome, and open on purpose.",
     "lead": "The signature look is real, not styling: a see-through PETG shell over visible electronics, a 1-bit OLED, and orange keycaps as the one pop of colour.",
     "table": {
       "processor": { "part": "SoC", "detail": "ESP32-C6 — RISC-V, single-core, 512KB SRAM" },
@@ -73,7 +68,6 @@
       "clock": { "part": "Clock", "detail": "Battery-backed DS1307 real-time clock" },
       "sound": { "part": "Sound", "detail": "Passive piezo buzzer (PC speaker) — tones, tunes, selectable startup jingles" },
       "radio": { "part": "Radio", "detail": "Wi-Fi 6, Bluetooth 5 LE, Zigbee, Thread, plus ESP-NOW device-to-device" },
-      "radioExtra": { "part": "Radio (extra)", "detail": "868 MHz LoRa transceiver on board — used by the upcoming Meshtastic port" },
       "connection": { "part": "Connection", "detail": "Single USB-C port — charging, flashing, and host tools" },
       "power": { "part": "Power", "detail": "1000 mAh Li-Po (102050) with on-device battery percentage and a physical battery kill-switch to prevent degradation." },
       "enclosure": { "part": "Enclosure", "detail": "3D-printed transparent PETG shell with orange PLA keycaps — internals visible." }
@@ -81,9 +75,9 @@
   },
   "openSource": {
     "eyebrow": "Open source ecosystem",
-    "title": "One open device. Two different firmwares. Endless hacking.",
+    "title": "One open device. One open firmware. Endless tinkering.",
     "lead": "Everything is public — firmware, docs, and the enclosure CAD. Openness is the pitch: the site points outward to GitHub, not inward to a store.",
-    "caption": "The same hardware becomes a pocket multitool or a LoRa mesh node — right from your browser, once the web flasher lands.",
+    "caption": "Install or update it right from your browser, once the web flasher lands.",
     "statusSoon": "Soon",
     "statusShipping": "Shipping",
     "statusNow": "Now",
@@ -93,11 +87,6 @@
         "role": "J++Device Operating System",
         "body1": "The operating system this whole page is about: a launcher, sandboxed apps, games, the demoscene, and the full SDK.",
         "body": "A firmware based on ESP-IDF intended to run apps that make full use of the available hardware through App SDK. Has a few built-in apps: Games, Fable Demoscene, MeetApp."
-      },
-      "meshtastic": {
-        "name": "Meshtastic port",
-        "role": "LoRa mesh node",
-        "body": "A second firmware that lights up the on-board 868 MHz LoRa radio for long-range mesh messaging. Same hardware, flash a different firmware, become a mesh communicator."
       }
     },
     "roadmap": {
@@ -113,13 +102,9 @@
         "name": "Enclosure CAD",
         "body": "All 3D-printable case files (Autodesk Fusion) — print the transparent shell and orange keycaps yourself."
       },
-      "meshtastic": {
-        "name": "Meshtastic port",
-        "body": "A LoRa mesh firmware for the same hardware. Sources will be on GitHub."
-      },
       "web_flasher": {
         "name": "Web flasher",
-        "body": "Install JPPDOS, the Meshtastic port, or a custom firmware from your browser over USB — no toolchain."
+        "body": "Install JPPDOS or a custom firmware from your browser over USB — no toolchain."
       },
       "web_ui": {
         "name": "Management Web UI",

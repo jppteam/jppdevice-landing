@@ -35,7 +35,7 @@ defineProps({ name: { type: String, required: true } })
       <path d="M9 16a5 5 0 0 1 6 0" />
       <circle cx="12" cy="19" r="0.6" fill="currentColor" stroke="none" />
     </template>
-    <!-- radio / lora -->
+    <!-- radio -->
     <template v-else-if="name === 'radio'">
       <circle cx="12" cy="12" r="2.5" />
       <path d="M7 7a7 7 0 0 0 0 10M17 7a7 7 0 0 1 0 10" />

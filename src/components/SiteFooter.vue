@@ -18,7 +18,6 @@ const cols = computed(() => [
   {
     title: t('footer.cols.roadmap'),
     links: [
-      { label: t('footer.links.meshtastic'), href: site.links.meshtastic },
       { label: t('footer.links.webFlasher'), href: site.links.webFlasher },
       { label: t('footer.links.webUi'), href: site.links.webUi },
     ],
