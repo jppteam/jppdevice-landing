@@ -76,6 +76,60 @@ defineProps({ name: { type: String, required: true } })
         <path d="M10.05 10.607c-.844-2.153-.679-4.978 1.061-6.718s4.95-2.121 6.717-1.06l-3.04 3.04l-.283 3.111l3.111-.282l3.04-3.041c1.062 1.768.68 4.978-1.06 6.717c-1.74 1.74-4.564 1.905-6.717 1.061"/>
       </g>
     </template>
+    <!-- folder -->
+    <template v-else-if="name === 'folder'">
+      <path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+    </template>
+    <!-- file -->
+    <template v-else-if="name === 'file'">
+      <path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
+      <path d="M14 3v4h4" />
+    </template>
+    <!-- arrow up -->
+    <template v-else-if="name === 'arrow-up'">
+      <path d="M12 19V5" />
+      <path d="M6 11l6-6 6 6" />
+    </template>
+    <!-- download -->
+    <template v-else-if="name === 'download'">
+      <path d="M12 3v11" />
+      <path d="M7 9l5 5 5-5" />
+      <path d="M5 19h14" />
+    </template>
+    <!-- trash -->
+    <template v-else-if="name === 'trash'">
+      <path d="M4 7h16" />
+      <path d="M9 7V4h6v3" />
+      <path d="M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13" />
+      <path d="M10 11v6M14 11v6" />
+    </template>
+    <!-- usb -->
+    <template v-else-if="name === 'usb'">
+      <!-- Icon from Iconoir by Luca Burgio - https://github.com/iconoir-icons/iconoir/blob/main/LICENSE -->
+      <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12.5 2v15m0-3l5.5-2V8.5M12.5 16L7 14.5v-3M12.5 22a2.5 2.5 0 1 0 0-5a2.5 2.5 0 0 0 0 5m4-16.5v3h3v-3zm-6-1.5l2-2l2 2M7 11a2 2 0 1 0 0-4a2 2 0 0 0 0 4"/>
+    </template>
+    <!-- tag (version / label) -->
+    <template v-else-if="name === 'tag'">
+      <path d="M3 11V4a1 1 0 0 1 1-1h7l9 9-8 8-9-9z" />
+      <circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none" />
+    </template>
+    <!-- user -->
+    <template v-else-if="name === 'user'">
+      <circle cx="12" cy="8" r="3.2" />
+      <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6" />
+    </template>
+    <!-- id (hardware id / badge) -->
+    <template v-else-if="name === 'id'">
+      <rect x="4" y="5" width="16" height="14" rx="2" />
+      <circle cx="9.5" cy="10.5" r="1.6" />
+      <path d="M6.5 16c.4-1.6 1.7-2.3 3-2.3s2.6.7 3 2.3" />
+      <path d="M14.5 9.5h3M14.5 12.5h3" />
+    </template>
+    <!-- shield (certificate / verification) -->
+    <template v-else-if="name === 'shield'">
+      <path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" />
+      <path d="M9 12l2 2 4-4" />
+    </template>
   </svg>
 </template>
 

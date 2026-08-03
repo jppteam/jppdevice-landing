@@ -194,23 +194,15 @@
     "copied": "Copied"
   },
   "manager": {
-    "eyebrow": "Tools",
     "title": "J++Device Manager",
-    "beta": "Beta",
-    "lead": "Flash firmware, manage the SD card, and install apps — all from your browser over Web Serial. Connect your J++Device with a USB-C cable and give consent on the device when asked.",
+    "lead": "Flash firmware and manage files on your J++Device through USB connection right in your browser.",
+    "unsupportedTitle": "Browser not supported",
     "unsupported": "Your browser doesn't support the Web Serial API. Please use a Chromium-based browser (Chrome, Edge, Brave) to connect to your device.",
-    "connect": "Connect device",
-    "connectHint": "Connect your J++Device over USB-C, then open a session. You'll be asked to press Allow on the device.",
-    "connecting": "Connecting…",
-    "consent": "Waiting for consent on the device — press Allow…",
-    "disconnect": "Disconnect",
-    "connected": "Connected",
-    "sessionOpen": "Session open",
-    "noSession": "No session",
-    "denied": "Consent was denied on the device.",
-    "appRunning": "Close any running app on the device, then try again.",
+    "syncTime": "Sync time",
+    "timeSynced": "Time synced from your computer.",
     "info": {
       "title": "Device",
+      "identity": "About the device",
       "fw": "Firmware",
       "user": "User",
       "hwid": "HWID",
@@ -220,20 +212,39 @@
       "free": "free",
       "used": "used",
       "total": "total",
-      "noCard": "SD card unavailable"
+      "noCard": "SD card unavailable",
+      "lrv": "LRV serial number",
+      "lrvHint": "Not verified"
     },
     "tabs": {
-      "flash": "Flash firmware",
       "files": "Files",
       "apps": "Apps"
     },
+    "log": {
+      "show": "Show connection log",
+      "close": "Close"
+    },
+    "connectCard": {
+      "title": "JPPDOS Serial Manager",
+      "connect": "Connect device",
+      "hint": "Connect your J++Device over USB-C, then open a session. You'll be asked to press Allow on the device.",
+      "connecting": "Connecting…",
+      "consent": "Waiting for consent on the device — press Allow…",
+      "disconnect": "Disconnect",
+      "connected": "Connected",
+      "sessionOpen": "Session open",
+      "noSession": "Not connected",
+      "denied": "Consent was denied on the device.",
+      "appRunning": "Close any running app on the device, then try again."
+    },
     "flash": {
       "title": "Flash firmware",
-      "body": "Select a JPPDOS merged firmware image (e.g. build/merged.bin) and write it to the device. Flashing replaces the operating system — make sure you have the right image. The device will reboot and re-enumerate when done.",
-      "pick": "Choose firmware .bin",
+      "body": "Select a JPPDOS firmware image (build/merged.bin) and write it will be written to the device.",
+      "pick": "Select a .bin file",
+      "browseReleases": "Download JPPDOS",
       "picked": "Firmware image",
       "size": "size",
-      "flash": "Flash firmware",
+      "flash": "Flash",
       "flashing": "Flashing…",
       "progress": "Progress",
       "done": "Firmware flashed. The device is rebooting.",
@@ -242,7 +253,22 @@
       "fail": "Flashing failed",
       "chip": "chip",
       "flashSize": "flash",
-      "reboot": "rebooting"
+      "reboot": "rebooting",
+      "endingSession": "Closing device session before flashing…",
+      "endsSession": "Starting a flash will end the current device session."
+    },
+    "releases": {
+      "title": "JPPDOS releases",
+      "lead": "Fetched live from GitHub. Download a firmware image, then pick it with \"Select a .bin file\" to flash it.",
+      "includePrereleases": "Include pre-releases",
+      "loading": "Loading releases…",
+      "error": "Couldn't load releases",
+      "empty": "No releases match — try including pre-releases.",
+      "prerelease": "Pre-release",
+      "downloadBin": "Download .bin",
+      "noAsset": "No firmware image in this release",
+      "changelog": "Changelog",
+      "close": "Close"
     },
     "files": {
       "title": "SD card",
@@ -257,8 +283,6 @@
       "mkdirPrompt": "Folder name",
       "loading": "Loading…",
       "empty": "This folder is empty.",
-      "syncTime": "Sync time",
-      "timeSynced": "Time synced from your computer.",
       "downloadOk": "Downloaded and verified (CRC-32 OK).",
       "downloadBad": "Downloaded but CRC-32 mismatch — the file may be corrupt.",
       "uploaded": "Uploaded {n} file(s).",
@@ -266,7 +290,9 @@
       "created": "Created {name}.",
       "size": "size",
       "dir": "dir",
-      "items": "item(s)"
+      "items": "item(s)",
+      "up": "Up",
+      "cancel": "Cancel"
     },
     "apps": {
       "title": "Install an app",
@@ -290,6 +316,8 @@
       "folderHint": "Pick the app folder that contains manifest.json (Folder picker works in Chrome/Edge)."
     },
     "console": {
+      "title": "Log",
+      "download": "Download log",
       "clear": "Clear",
       "empty": "Log appears here."
     },

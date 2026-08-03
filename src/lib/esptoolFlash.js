@@ -22,7 +22,7 @@ function formatBytes(n) {
   return `${(n / (1024 * 1024)).toFixed(2)} MB`
 }
 
-export async function flashFirmware(port, firmwareBytes, { onLog, onProgress }) {
+export async function flashFirmware(port, firmwareBytes, { onLog, onProgress, onChipInfo, onRebooting }) {
   const log = (msg) => onLog && onLog(msg)
 
   if (!firmwareBytes || !firmwareBytes.length) {
@@ -51,9 +51,11 @@ export async function flashFirmware(port, firmwareBytes, { onLog, onProgress }) 
     transport.setDeviceLostCallback(() => log('\n⚠ Device disconnected during kick.'))
     await loader.main()
 
-    log(`Chip: ${loader.chip.CHIP_NAME || 'detected'}`)
+    const chipName = loader.chip.CHIP_NAME || 'detected'
+    log(`Chip: ${chipName}`)
     const flashSize = await loader.detectFlashSize()
     log(`Flash size: ${flashSize}  ·  firmware: ${formatBytes(firmwareBytes.length)}`)
+    onChipInfo && onChipInfo(chipName, flashSize)
 
     const fileArray = [{ data: new Uint8Array(firmwareBytes), address: FLASH_OFFSET }]
 
@@ -71,6 +73,7 @@ export async function flashFirmware(port, firmwareBytes, { onLog, onProgress }) 
     })
 
     log('Flashing complete.')
+    onRebooting && onRebooting()
     await loader.softReset(false)
     log('Device rebooted.')
   } finally {

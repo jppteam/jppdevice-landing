@@ -1,45 +1,55 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useManagerConnection } from '../../lib/useManagerConnection.js'
+import IconGlyph from '../IconGlyph.vue'
 
 const { t } = useI18n()
-const lines = ref([])
+const { logLines, clearLog } = useManagerConnection()
 const refEl = ref(null)
 
-defineExpose({ push, clear, focus })
-
-function push(text) {
-  const time = new Date().toLocaleTimeString([], { hour12: false })
-  lines.value.push({ time, text: String(text) })
-  // Keep the log bounded; autoscroll to the newest line.
-  if (lines.value.length > 400) lines.value.splice(0, lines.value.length - 400)
+function scrollToBottom() {
   requestAnimationFrame(() => {
     if (refEl.value) refEl.value.scrollTop = refEl.value.scrollHeight
   })
 }
-function clear() {
-  lines.value = []
-}
-function focus() {
-  refEl.value?.focus()
+watch(() => logLines.value.length, scrollToBottom)
+
+function downloadLog() {
+  const text = logLines.value.map((l) => `${l.time}  ${l.text}`).join('\n')
+  const blob = new Blob([text], { type: 'text/plain' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `jppdevice-manager-log-${new Date().toISOString().replace(/[:.]/g, '-')}.txt`
+  document.body.appendChild(a)
+  a.click()
+  a.remove()
+  URL.revokeObjectURL(url)
 }
 </script>
 
 <template>
   <div class="con">
     <div class="con__head">
-      <span class="con__title mono">Log</span>
-      <button class="con__clear btn btn--ghost btn--sm" @click="clear">{{ t('manager.console.clear') }}</button>
+      <span class="con__title mono">{{ t('manager.console.title') }}</span>
+      <div class="con__head-actions">
+        <button class="con__btn btn btn--ghost btn--sm" @click="downloadLog">
+          <IconGlyph name="download" />
+          {{ t('manager.console.download') }}
+        </button>
+        <button class="con__btn btn btn--ghost btn--sm" @click="clearLog">{{ t('manager.console.clear') }}</button>
+      </div>
     </div>
-    <pre ref="refEl" class="con__body" tabindex="0" aria-live="polite">
-      <template v-if="lines.length">
-        <div v-for="(l, i) in lines" :key="i" class="con__line">
+    <div ref="refEl" class="con__body" tabindex="0" aria-live="polite">
+      <template v-if="logLines.length">
+        <div v-for="(l, i) in logLines" :key="i" class="con__line">
           <span class="con__time mono">{{ l.time }}</span>
           <span class="con__text">{{ l.text }}</span>
         </div>
       </template>
       <span v-else class="con__empty">{{ t('manager.console.empty') }}</span>
-    </pre>
+    </div>
   </div>
 </template>
 
@@ -57,8 +67,10 @@ function focus() {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
   padding: 0.5rem 0.9rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  flex-wrap: wrap;
 }
 .con__title {
   font-size: 0.7rem;
@@ -67,13 +79,24 @@ function focus() {
   color: var(--yellow);
   font-weight: 700;
 }
-.con__clear {
+.con__head-actions {
+  display: flex;
+  gap: 0.4rem;
+}
+.con__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
   color: rgba(255, 255, 255, 0.7);
   border-color: rgba(255, 255, 255, 0.3);
   padding: 0.2em 0.7em;
   font-size: 0.72rem;
 }
-.con__clear:hover {
+.con__btn :deep(.glyph) {
+  width: 0.9em;
+  height: 0.9em;
+}
+.con__btn:hover {
   background: var(--yellow);
   color: var(--ink);
 }

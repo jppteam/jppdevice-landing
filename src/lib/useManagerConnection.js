@@ -15,14 +15,26 @@ const state = {
   sessionOpen: ref(false),
   connecting: ref(false),
   info: ref(null),
+  lrv: ref(null),
 }
 
 // Keep a live console shared globally too.
 const logLines = ref([])
-function log(text) {
+// Raw appender — used for text that's already fully-formed, notably the
+// device's own serial noise (SmpSession forwards ESP_LOG output verbatim via
+// this, so it must not get the [webmgr] prefix below).
+function appendLog(text) {
   const time = new Date().toLocaleTimeString([], { hour12: false })
   logLines.value.push({ time, text: String(text) })
   if (logLines.value.length > 500) logLines.value.splice(0, logLines.value.length - 500)
+}
+// Prefixed logger for the web manager's own status messages — this is what
+// every UI call site (components, this file) should use.
+function log(text) {
+  appendLog('[webmgr] ' + String(text))
+}
+function clearLog() {
+  logLines.value = []
 }
 
 let portKept = null
@@ -49,7 +61,16 @@ async function connect(log) {
       }
       sessionInstance = null
     }
-    sessionInstance = new SmpSession(state.port.value, log)
+    sessionInstance = new SmpSession(state.port.value, appendLog)
+    sessionInstance.onSessionLost = () => {
+      // The device closed the session on its own (cancelled on-device,
+      // device-side timeout, etc.) — the port/transport is still fine, so
+      // only drop the session-level state. openSession() can re-establish a
+      // session over the same still-open port.
+      state.sessionOpen.value = false
+      state.info.value = null
+      state.lrv.value = null
+    }
     await sessionInstance.open()
     state.session.value = sessionInstance
     state.sessionOpen.value = false
@@ -84,6 +105,13 @@ async function refreshInfo(log) {
     state.info.value = oldInfo
     throw e
   }
+  try {
+    state.lrv.value = await s.getLrvData()
+  } catch {
+    // Transport hiccup on a best-effort read — don't fail the whole connect
+    // flow over it, just treat it the same as "no LRV identity".
+    state.lrv.value = null
+  }
   return state.info.value
 }
 
@@ -98,8 +126,19 @@ async function endSession() {
   }
   state.sessionOpen.value = false
   state.info.value = null
+  state.lrv.value = null
   sessionInstance = null
   portKept = null
+}
+
+// Best-effort: tell the device the session is over when the tab goes away,
+// so it doesn't sit waiting for a host that already left. pagehide (rather
+// than beforeunload) also covers bfcache navigations, and doesn't need to
+// block navigation the way beforeunload can.
+if (typeof window !== 'undefined') {
+  window.addEventListener('pagehide', () => {
+    if (sessionInstance) endSession()
+  })
 }
 
 function errorMessage(e, t) {
@@ -129,8 +168,10 @@ export function useManagerConnection() {
     sessionOpen: readonly(state.sessionOpen),
     connecting: readonly(state.connecting),
     info: readonly(state.info),
+    lrv: readonly(state.lrv),
     logLines,
     log,
+    clearLog,
     connect,
     openSession,
     refreshInfo,

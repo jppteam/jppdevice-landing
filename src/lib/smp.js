@@ -136,6 +136,9 @@ function toCstr(s) {
   out.set(bytes)
   return out
 }
+function toHex(bytes) {
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('')
+}
 
 // ---- Session class ---------------------------------------------------------
 
@@ -171,6 +174,11 @@ export class SmpSession {
     this._reading = false
     this._closed = false
     this._readPromise = null
+    // Fired when a command response comes back ERR_NO_SESSION — the device's
+    // authoritative signal that it has closed the session on its own (e.g.
+    // cancelled on the OLED, or a device-side timeout), independent of
+    // anything the host did.
+    this.onSessionLost = null
   }
 
   // ---- transport primitives ----
@@ -324,6 +332,7 @@ export class SmpSession {
           const resp = await this._readFrame(deadline - Date.now())
           const [rseq, status] = [resp[0], resp[1]]
           if (rseq === seq) {
+            if (status === STATUS.ERR_NO_SESSION) this.onSessionLost?.()
             return { status, body: resp.slice(2) }
           }
           // Stale reply to an earlier attempt: skip and keep reading.
@@ -381,6 +390,31 @@ export class SmpSession {
       sdUsed,
       sdFree,
       sdLabel: label.str,
+    }
+  }
+
+  // Returns null when the device carries no LRV identity (ERR_NOT_FOUND is
+  // the expected response for a non-provisioned unit, not a real failure).
+  async getLrvData() {
+    const { status, body } = await this.cmd(CMD.GET_LRV_DATA)
+    if (status === STATUS.ERR_NOT_FOUND) return null
+    this._requireOk(status, 'GET_LRV_DATA')
+    const cert = cstr(body, 0)
+    let off = cert.next
+    const certSig = body.slice(off, off + 64)
+    off += 64
+    const devicePubkey = body.slice(off, off + 32)
+    off += 32
+    const challenge = cstr(body, off)
+    off = challenge.next
+    const respSig = body.slice(off, off + 64)
+    return {
+      cert: cert.str,
+      certSig,
+      devicePubkey,
+      pubkeyFingerprint: toHex(devicePubkey.subarray(0, 4)).toUpperCase(),
+      challenge: challenge.str,
+      respSig,
     }
   }
 
