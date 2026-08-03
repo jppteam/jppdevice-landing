@@ -5,7 +5,6 @@ import WhatIsItSection from '../components/sections/WhatIsItSection.vue'
 import AppsShowcaseSection from '../components/sections/AppsShowcaseSection.vue'
 import DevelopersSection from '../components/sections/DevelopersSection.vue'
 import SpecsSection from '../components/sections/SpecsSection.vue'
-import OpenSourceSection from '../components/sections/OpenSourceSection.vue'
 import GetOneSection from '../components/sections/GetOneSection.vue'
 
 // Progressive scroll-reveal for sections (content is fully visible without JS).
@@ -37,7 +36,6 @@ onMounted(() => {
     <HeroSection />
     <WhatIsItSection />
     <SpecsSection />
-    <OpenSourceSection />
     <AppsShowcaseSection />
     <DevelopersSection />
     <GetOneSection />

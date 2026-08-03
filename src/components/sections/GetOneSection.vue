@@ -26,7 +26,7 @@ const verifyReady = site.links.verify && site.links.verify !== '#'
           <p class="way__body">
             {{ t('getOne.way1Body') }}
           </p>
-          <a class="btn btn--yellow" :href="site.links.cad" target="_blank" rel="noopener">{{ t('getOne.way1Cta') }}</a>
+          <a class="btn btn--yellow" :href="site.links.repos.cad.github" target="_blank" rel="noopener">{{ t('getOne.way1Cta') }}</a>
         </article>
 
         <article class="way">

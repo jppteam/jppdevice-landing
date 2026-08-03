@@ -45,7 +45,7 @@ const { t } = useI18n()
 
           <div class="dev__links">
             <a class="btn btn--on-ink btn--sm" :href="site.links.appDocs" target="_blank" rel="noopener">{{ t('developers.sdkReference') }}</a>
-            <a class="btn btn--on-ink btn--ghost btn--sm" :href="site.links.firmware" target="_blank" rel="noopener">{{ t('developers.firmwareRepo') }}</a>
+            <a class="btn btn--on-ink btn--ghost btn--sm" :href="site.links.repos.jppdos.github" target="_blank" rel="noopener">{{ t('developers.firmwareRepo') }}</a>
           </div>
         </aside>
       </div>

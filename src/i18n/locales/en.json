@@ -5,13 +5,8 @@
     "soon": "Soon"
   },
   "nav": {
-    "what": "What is it",
-    "apps": "Apps",
-    "developers": "Developers",
-    "specs": "Specs",
-    "openSource": "Open source",
-    "getOne": "Get one",
-    "manager": "Manager (Beta)",
+    "sdkDocs": "App SDK docs",
+    "manager": "Manager β",
     "toggleMenu": "Toggle menu"
   },
   "footer": {
@@ -74,42 +69,30 @@
       "enclosure": { "part": "Enclosure", "detail": "3D-printed transparent PETG shell with orange PLA keycaps — internals visible." }
     }
   },
-  "openSource": {
-    "eyebrow": "Open source ecosystem",
-    "title": "One open device. One open firmware. Endless tinkering.",
-    "lead": "Everything is public — firmware, docs, and the enclosure CAD. Openness is the pitch: the site points outward to GitHub, not inward to a store.",
-    "caption": "Install or update it right from your browser, once the web flasher lands.",
-    "statusSoon": "Soon",
-    "statusShipping": "Shipping",
-    "statusNow": "Now",
-    "firmwares": {
+  "repoModal": {
+    "eyebrow": "Open source",
+    "title": "All the repos",
+    "lead": "Every part of J++Device is public and hosted on GitHub and J++ team's GitLab.",
+    "githubLabel": "GitHub",
+    "mirrorLabel": "J++ GitLab",
+    "browseAll": "J++Device org on J++ GitLab",
+    "close": "Close",
+    "repos": {
       "jppdos": {
         "name": "JPPDOS",
-        "role": "J++Device Operating System",
-        "body1": "The operating system this whole page is about: a launcher, sandboxed apps, games, the demoscene, and the full SDK.",
-        "body": "A firmware based on ESP-IDF intended to run apps that make full use of the available hardware through App SDK. Has a few built-in apps: Games, Fable Demoscene, MeetApp."
-      }
-    },
-    "roadmap": {
-      "firmware": {
-        "name": "JPPDOS firmware",
-        "body": "Full open source for the operating system — launcher, apps, SDK, and all built-ins."
-      },
-      "docs": {
-        "name": "App developer docs",
-        "body": "Platform overview, MicroPython and native-C guides, manifest reference, and a complete SDK reference."
+        "body": "J++Device Operating System firmware sources and builds."
       },
       "cad": {
         "name": "Enclosure CAD",
-        "body": "All 3D-printable case files (Autodesk Fusion) — print the transparent shell and orange keycaps yourself."
+        "body": "Autodesk Fusion projects for the 3D printed shell and custom mainboard PCB."
       },
-      "web_flasher": {
-        "name": "Web flasher",
-        "body": "Install JPPDOS or a custom firmware from your browser over USB — no toolchain."
+      "apps": {
+        "name": "JPPDOS apps",
+        "body": "Repository with community-developed apps."
       },
-      "web_ui": {
-        "name": "Management Web UI",
-        "body": "A JPPD-SMP web app to manage a connected device — SD files, device info, time sync — from the browser."
+      "landing": {
+        "name": "Landing page",
+        "body": "The Vue website you're looking at right now."
       }
     }
   },

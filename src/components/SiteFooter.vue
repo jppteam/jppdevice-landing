@@ -10,9 +10,9 @@ const cols = computed(() => [
   {
     title: t('footer.cols.openSource'),
     links: [
-      { label: t('footer.links.firmware'), href: site.links.firmware, external: true },
+      { label: t('footer.links.firmware'), href: site.links.repos.jppdos.github, external: true },
       { label: t('footer.links.appDocs'), href: site.links.appDocs, external: true },
-      { label: t('footer.links.cad'), href: site.links.cad, external: true },
+      { label: t('footer.links.cad'), href: site.links.repos.cad.github, external: true },
     ],
   },
   {

@@ -64,4 +64,5 @@ jobs:
           aws s3 sync dist/ "s3://${S3_BUCKET}/" \
             --endpoint-url "$S3_ENDPOINT" \
             --delete \
+            --exclude "sdk-docs/*" \
             --no-progress

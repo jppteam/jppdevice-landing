@@ -31,11 +31,26 @@ export const site = {
 
   // External links — all PLACEHOLDER GitHub URLs until the owner provides real ones.
   links: {
-    firmware: 'https://github.com/jppteam/jppdos',
-    appDocs: 'https://github.com/jppteam/jppdos/tree/master/docs',
-    cad: 'https://github.com/jppteam/jppdevice-cad',
-    webFlasher: '#/manager', // J++Device Manager (Beta)
-    webUi: '#/manager', // J++Device Manager (Beta)
+    repos: {
+      jppdos: {
+        github: 'https://github.com/jppteam/jppdos',
+        jppgit: 'https://git.nova.tokyo/jppdevice/jppdos'
+      },
+      cad: {
+        github: 'https://github.com/jppteam/jppdevice-cad',
+        jppgit: 'https://git.nova.tokyo/jppdevice/jppdevice-cad'
+      },
+      apps: {
+        github: 'https://github.com/jppteam/jppdos-apps',
+        jppgit: 'https://git.nova.tokyo/jppdevice/jppdos-apps'
+      },
+      landing: {
+        github: 'https://github.com/jppteam/jppdevice-landing',
+        jppgit: 'https://git.nova.tokyo/jppdevice/landing-page'
+      }
+    },
+    jppgitOrg: 'https://git.nova.tokyo/jppdevice',
+    appDocs: 'https://jppdevice.by.m4l3vi.ch/sdk-docs/',
     manager: '#/manager', // J++Device Manager (Beta)
     verify: '#', // Limited Run verification page — ships later (roadmap)
   },

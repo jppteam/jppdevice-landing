@@ -4,18 +4,15 @@ import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import Wordmark from './Wordmark.vue'
 import LocaleSwitcher from './LocaleSwitcher.vue'
+import GithubReposModal from './GithubReposModal.vue'
 import { site } from '../data/site.js'
 
 const { t } = useI18n()
 const route = useRoute()
+const reposOpen = ref(false)
 
 const nav = computed(() => [
-  { to: { path: '/', hash: '#what' }, label: t('nav.what') },
-  { to: { path: '/', hash: '#apps' }, label: t('nav.apps') },
-  { to: { path: '/', hash: '#developers' }, label: t('nav.developers') },
-  { to: { path: '/', hash: '#specs' }, label: t('nav.specs') },
-  { to: { path: '/', hash: '#open-source' }, label: t('nav.openSource') },
-  { to: { path: '/', hash: '#get-one' }, label: t('nav.getOne') },
+  { to: site.links.appDocs, label: t('nav.sdkDocs'), anchor: true },
   { to: { path: '/manager' }, label: t('nav.manager'), manager: true },
 ])
 
@@ -34,20 +31,27 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
       </router-link>
 
       <nav class="hd__nav" aria-label="Primary">
-        <router-link
-          v-for="item in nav"
-          :key="item.to.path + (item.to.hash || '')"
-          class="hd__link"
-          :class="{ 'hd__link--cta': item.manager }"
-          :to="item.to"
-        >{{ item.label }}</router-link>
+        <template v-for="item in nav" :key="item.to">
+          <a
+            v-if="item.anchor"
+            class="hd__link"
+            target="_blank"
+            :href="item.to"
+          >{{ item.label }}</a>
+          <router-link
+            v-else
+            class="hd__link"
+            :class="{ 'hd__link--cta': item.manager }"
+            :to="item.to"
+          >{{ item.label }}</router-link>
+        </template>
       </nav>
 
       <div class="hd__actions">
         <LocaleSwitcher />
-        <a class="btn btn--ink btn--sm" :href="site.links.firmware" target="_blank" rel="noopener">
+        <button type="button" class="btn btn--ink btn--sm" @click="reposOpen = true">
           {{ t('common.githubLabel') }}
-        </a>
+        </button>
         <button
           class="hd__burger"
           :aria-expanded="menuOpen"
@@ -69,6 +73,8 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
         @click="menuOpen = false"
       >{{ item.label }}</router-link>
     </div>
+
+    <GithubReposModal v-model="reposOpen" />
   </header>
 </template>
 

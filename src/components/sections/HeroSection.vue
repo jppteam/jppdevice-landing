@@ -1,11 +1,14 @@
 <script setup>
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Wordmark from '../Wordmark.vue'
 import DeviceFrame from '../DeviceFrame.vue'
 import Badge from '../Badge.vue'
+import GithubReposModal from '../GithubReposModal.vue'
 import { site } from '../../data/site.js'
 
 const { t } = useI18n()
+const reposOpen = ref(false)
 </script>
 
 <template>
@@ -29,9 +32,9 @@ const { t } = useI18n()
         </p>
 
         <div class="hero__cta">
-          <a class="btn btn--yellow btn--lg" :href="site.links.firmware" target="_blank" rel="noopener">
+          <button type="button" class="btn btn--yellow btn--lg" @click="reposOpen = true">
             {{ t('hero.ctaBuild') }}
-          </a>
+          </button>
         </div>
       </div>
 
@@ -40,6 +43,8 @@ const { t } = useI18n()
         <p class="hero__cap mono">{{ t('hero.caption') }}</p>
       </div>
     </div>
+
+    <GithubReposModal v-model="reposOpen" />
   </section>
 </template>
 
