@@ -1,19 +1,22 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRoute } from 'vue-router'
 import Wordmark from './Wordmark.vue'
 import LocaleSwitcher from './LocaleSwitcher.vue'
 import { site } from '../data/site.js'
 
 const { t } = useI18n()
+const route = useRoute()
 
 const nav = computed(() => [
-  { href: '#what', label: t('nav.what') },
-  { href: '#apps', label: t('nav.apps') },
-  { href: '#developers', label: t('nav.developers') },
-  { href: '#specs', label: t('nav.specs') },
-  { href: '#open-source', label: t('nav.openSource') },
-  { href: '#get-one', label: t('nav.getOne') },
+  { to: { path: '/', hash: '#what' }, label: t('nav.what') },
+  { to: { path: '/', hash: '#apps' }, label: t('nav.apps') },
+  { to: { path: '/', hash: '#developers' }, label: t('nav.developers') },
+  { to: { path: '/', hash: '#specs' }, label: t('nav.specs') },
+  { to: { path: '/', hash: '#open-source' }, label: t('nav.openSource') },
+  { to: { path: '/', hash: '#get-one' }, label: t('nav.getOne') },
+  { to: { path: '/manager' }, label: t('nav.manager'), manager: true },
 ])
 
 const scrolled = ref(false)
@@ -26,12 +29,18 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
 <template>
   <header class="hd" :class="{ 'hd--scrolled': scrolled }">
     <div class="container hd__inner">
-      <a class="hd__brand" href="#top" :aria-label="t('common.brandHome')">
+      <router-link class="hd__brand" :to="{ path: '/', hash: '#top' }" :aria-label="t('common.brandHome')">
         <Wordmark :bar="false" title="J++ Device" />
-      </a>
+      </router-link>
 
       <nav class="hd__nav" aria-label="Primary">
-        <a v-for="item in nav" :key="item.href" class="hd__link" :href="item.href">{{ item.label }}</a>
+        <router-link
+          v-for="item in nav"
+          :key="item.to.path + (item.to.hash || '')"
+          class="hd__link"
+          :class="{ 'hd__link--cta': item.manager }"
+          :to="item.to"
+        >{{ item.label }}</router-link>
       </nav>
 
       <div class="hd__actions">
@@ -51,13 +60,14 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
     </div>
 
     <div v-show="menuOpen" class="hd__mobile">
-      <a
+      <router-link
         v-for="item in nav"
-        :key="item.href"
+        :key="item.to.path + (item.to.hash || '')"
         class="hd__mlink"
-        :href="item.href"
+        :class="{ 'hd__mlink--cta': item.manager }"
+        :to="item.to"
         @click="menuOpen = false"
-      >{{ item.label }}</a>
+      >{{ item.label }}</router-link>
     </div>
   </header>
 </template>
@@ -102,9 +112,24 @@ onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
   border-bottom: 2px solid transparent;
   transition: color 0.15s, border-color 0.15s;
 }
-.hd__link:hover {
+.hd__link:hover,
+.hd__link.router-link-active {
   color: var(--ink);
   border-bottom-color: var(--yellow);
+}
+.hd__link--cta {
+  color: var(--ink);
+  border-bottom-color: var(--yellow);
+}
+.hd__link--cta.router-link-active {
+  color: var(--white);
+  background: var(--ink);
+  border-radius: 999px;
+  padding: 0.3rem 0.85rem;
+}
+.hd__mobile .hd__mlink--cta {
+  color: var(--ink);
+  font-weight: 800;
 }
 .hd__actions {
   display: flex;

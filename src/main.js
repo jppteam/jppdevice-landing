@@ -19,5 +19,6 @@ import '@fontsource/onest/cyrillic-800.css'
 import '@fontsource/onest/cyrillic-900.css'
 import App from './App.vue'
 import { i18n } from './i18n/index.js'
+import { router } from './router/index.js'
 
-createApp(App).use(i18n).mount('#app')
+createApp(App).use(i18n).use(router).mount('#app')

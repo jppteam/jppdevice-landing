@@ -10,24 +10,24 @@ const cols = computed(() => [
   {
     title: t('footer.cols.openSource'),
     links: [
-      { label: t('footer.links.firmware'), href: site.links.firmware },
-      { label: t('footer.links.appDocs'), href: site.links.appDocs },
-      { label: t('footer.links.cad'), href: site.links.cad },
+      { label: t('footer.links.firmware'), href: site.links.firmware, external: true },
+      { label: t('footer.links.appDocs'), href: site.links.appDocs, external: true },
+      { label: t('footer.links.cad'), href: site.links.cad, external: true },
     ],
   },
   {
     title: t('footer.cols.roadmap'),
     links: [
-      { label: t('footer.links.webFlasher'), href: site.links.webFlasher },
-      { label: t('footer.links.webUi'), href: site.links.webUi },
+      { label: t('footer.links.webFlasher'), to: { path: '/manager' } },
+      { label: t('footer.links.webUi'), to: { path: '/manager' } },
     ],
   },
   {
     title: t('footer.cols.thisPage'),
     links: [
-      { label: t('footer.links.what'), href: '#what' },
-      { label: t('footer.links.developers'), href: '#developers' },
-      { label: t('footer.links.getOne'), href: '#get-one' },
+      { label: t('footer.links.what'), to: { path: '/', hash: '#what' } },
+      { label: t('footer.links.developers'), to: { path: '/', hash: '#developers' } },
+      { label: t('footer.links.getOne'), to: { path: '/', hash: '#get-one' } },
     ],
   },
 ])
@@ -37,9 +37,9 @@ const cols = computed(() => [
   <footer class="ft section--ink">
     <div class="container ft__inner">
       <div class="ft__brand">
-        <a href="#top" :aria-label="t('common.brandHome')" class="ft__mark">
+        <router-link :to="{ path: '/', hash: '#top' }" :aria-label="t('common.brandHome')" class="ft__mark">
           <Wordmark :bar="false" title="J++ Device" />
-        </a>
+        </router-link>
         <p class="ft__blurb">
           {{ t('footer.blurb') }}
         </p>
@@ -51,7 +51,8 @@ const cols = computed(() => [
           <h3 class="ft__coltitle">{{ col.title }}</h3>
           <ul>
             <li v-for="l in col.links" :key="l.label">
-              <a :href="l.href" target="_blank" rel="noopener">{{ l.label }}</a>
+              <a v-if="l.external" :href="l.href" target="_blank" rel="noopener">{{ l.label }}</a>
+              <router-link v-else :to="l.to">{{ l.label }}</router-link>
             </li>
           </ul>
         </div>

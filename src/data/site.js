@@ -34,8 +34,9 @@ export const site = {
     firmware: 'https://github.com/jppteam/jppdos',
     appDocs: 'https://github.com/jppteam/jppdos/tree/master/docs',
     cad: 'https://github.com/jppteam/jppdevice-cad',
-    webFlasher: '#', // ships later (roadmap)
-    webUi: '#', // ships later (roadmap)
+    webFlasher: '#/manager', // J++Device Manager (Beta)
+    webUi: '#/manager', // J++Device Manager (Beta)
+    manager: '#/manager', // J++Device Manager (Beta)
     verify: '#', // Limited Run verification page — ships later (roadmap)
   },
 }

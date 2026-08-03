@@ -15,11 +15,11 @@ const firmwares = [
 // Ecosystem roadmap. Copy lives in i18n under openSource.roadmap.<id> (hyphens
 // in ids become underscores in the key lookup).
 const roadmap = [
-  { id: 'firmware', status: 'shipped', link: site.links.firmware },
-  { id: 'docs', status: 'shipped', link: site.links.appDocs },
-  { id: 'cad', status: 'shipped', link: site.links.cad },
-  { id: 'web-flasher', status: 'soon', link: site.links.webFlasher },
-  { id: 'web-ui', status: 'soon', link: site.links.webUi },
+  { id: 'firmware', status: 'shipped', link: site.links.firmware, external: true },
+  { id: 'docs', status: 'shipped', link: site.links.appDocs, external: true },
+  { id: 'cad', status: 'shipped', link: site.links.cad, external: true },
+  { id: 'web-flasher', status: 'soon', to: { path: '/manager' } },
+  { id: 'web-ui', status: 'soon', to: { path: '/manager' } },
 ]
 
 const iconFor = {
@@ -57,26 +57,44 @@ const key = (id) => id.replace(/-/g, '_')
 
       <!-- Roadmap grid -->
       <div class="road">
-        <a
-          v-for="r in roadmap"
-          :key="r.id"
-          class="road__item"
-          :class="{ 'road__item--soon': r.status === 'soon' }"
-          :href="r.link"
-          :target="r.link && r.link !== '#' ? '_blank' : null"
-          rel="noopener"
-        >
-          <span class="road__icon"><IconGlyph :name="iconFor[r.id] || 'chip'" /></span>
-          <div class="road__text">
-            <div class="road__head">
-              <h4 class="road__name">{{ t(`openSource.roadmap.${key(r.id)}.name`) }}</h4>
-              <Badge :tone="r.status === 'soon' ? 'soon' : 'default'">
-                {{ r.status === 'soon' ? t('openSource.statusSoon') : t('openSource.statusNow') }}
-              </Badge>
+        <template v-for="r in roadmap" :key="r.id">
+          <a
+            v-if="r.external"
+            class="road__item"
+            :class="{ 'road__item--soon': r.status === 'soon' }"
+            :href="r.link"
+            target="_blank"
+            rel="noopener"
+          >
+            <span class="road__icon"><IconGlyph :name="iconFor[r.id] || 'chip'" /></span>
+            <div class="road__text">
+              <div class="road__head">
+                <h4 class="road__name">{{ t(`openSource.roadmap.${key(r.id)}.name`) }}</h4>
+                <Badge :tone="r.status === 'soon' ? 'soon' : 'default'">
+                  {{ r.status === 'soon' ? t('openSource.statusSoon') : t('openSource.statusNow') }}
+                </Badge>
+              </div>
+              <p class="road__body">{{ t(`openSource.roadmap.${key(r.id)}.body`) }}</p>
             </div>
-            <p class="road__body">{{ t(`openSource.roadmap.${key(r.id)}.body`) }}</p>
-          </div>
-        </a>
+          </a>
+          <router-link
+            v-else
+            class="road__item"
+            :class="{ 'road__item--soon': r.status === 'soon' }"
+            :to="r.to"
+          >
+            <span class="road__icon"><IconGlyph :name="iconFor[r.id] || 'chip'" /></span>
+            <div class="road__text">
+              <div class="road__head">
+                <h4 class="road__name">{{ t(`openSource.roadmap.${key(r.id)}.name`) }}</h4>
+                <Badge :tone="r.status === 'soon' ? 'soon' : 'default'">
+                  {{ r.status === 'soon' ? t('openSource.statusSoon') : t('openSource.statusNow') }}
+                </Badge>
+              </div>
+              <p class="road__body">{{ t(`openSource.roadmap.${key(r.id)}.body`) }}</p>
+            </div>
+          </router-link>
+        </template>
       </div>
     </div>
   </section>
