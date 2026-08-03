@@ -63,7 +63,7 @@ function onKeydown(e) {
         </SectionHeading>
 
         <div class="mpage__logbar">
-          <button class="btn btn--ghost btn--sm" :disabled="!sessionOpen" @click="logOpen = true">
+          <button class="btn btn--ghost btn--sm" @click="logOpen = true">
             <IconGlyph name="code" />
             {{ t('manager.log.show') }}
           </button>

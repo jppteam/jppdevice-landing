@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useManagerConnection } from '../../lib/useManagerConnection.js'
-import { flashFirmware } from '../../lib/esptoolFlash.js'
+import { flashFirmware, flashPartitionArchive } from '../../lib/esptoolFlash.js'
 import IconGlyph from '../IconGlyph.vue'
 import ManagerReleasesModal from './ManagerReleasesModal.vue'
 
@@ -17,6 +17,7 @@ const progress = ref(0)
 const status = ref('')
 const chipName = ref('')
 const flashSize = ref('')
+const nvsWarning = ref('')
 const releasesOpen = ref(false)
 
 function onFile(e) {
@@ -28,6 +29,7 @@ function onFile(e) {
   status.value = ''
   chipName.value = ''
   flashSize.value = ''
+  nvsWarning.value = ''
 }
 
 async function onFlash() {
@@ -37,6 +39,7 @@ async function onFlash() {
   progress.value = 0
   chipName.value = ''
   flashSize.value = ''
+  nvsWarning.value = ''
   try {
     // Flashing opens its own raw serial connection to the chip's ROM
     // bootloader; it can't share a port that a JPPD-SMP session already has
@@ -47,7 +50,7 @@ async function onFlash() {
     }
     firmwareBytes.value = new Uint8Array(await selected.value.arrayBuffer())
     const port = await navigator.serial.requestPort()
-    await flashFirmware(port, firmwareBytes.value, {
+    const callbacks = {
       onLog: (text) => log(text),
       onProgress: (written, total) => {
         progress.value = Math.round((written / total) * 100)
@@ -55,11 +58,32 @@ async function onFlash() {
       onChipInfo: (chip, size) => {
         chipName.value = chip
         flashSize.value = size
+        // onChipInfo only fires once the real write connection is up (after
+        // any NVS backup phase has already finished), so this is the right
+        // moment to move the status text off "backing up" and onto "flashing".
+        status.value = t('manager.flash.flashing')
       },
       onRebooting: () => {
         status.value = t('manager.flash.reboot')
       },
-    })
+    }
+    if (/\.zip$/i.test(selected.value.name)) {
+      // A .zip of separate partition images (idf.py build output). Each
+      // partition is written at its own offset, and since that never
+      // includes NVS, no backup/restore is needed here.
+      await flashPartitionArchive(port, firmwareBytes.value, callbacks)
+    } else {
+      // A single merged image spans the whole flash — including NVS — so
+      // flashFirmware backs that partition up first and restores it after.
+      await flashFirmware(port, firmwareBytes.value, {
+        ...callbacks,
+        onNvsStatus: (phase) => {
+          if (phase === 'backing-up') status.value = t('manager.flash.backingUpNvs')
+          else if (phase === 'restoring') status.value = t('manager.flash.restoringNvs')
+          else if (phase === 'restore-failed') nvsWarning.value = t('manager.flash.nvsRestoreFailed')
+        },
+      })
+    }
     status.value = t('manager.flash.done')
     progress.value = 100
   } catch (e) {
@@ -104,24 +128,12 @@ async function onFlash() {
       </button>
     </div>
 
-    <div class="mg-card__actions">
-      <label class="filebtn btn btn--ghost btn--sm">
-        <input type="file" accept=".bin,application/octet-stream" class="visually-hidden" @change="onFile" />
-        {{ t('manager.flash.pick') }}
-      </label>
-      <button class="btn btn--ghost btn--sm" @click="releasesOpen = true">
-        {{ t('manager.flash.browseReleases') }}
-      </button>
-    </div>
-
-    <p v-if="sessionOpen" class="flash__session-hint">{{ t('manager.flash.endsSession') }}</p>
-
     <div v-if="chipName || flashing || progress" class="mg-card__detail-wrap">
       <dl v-if="chipName" class="mg-card__detail">
         <div><dt>{{ t('manager.flash.chip') }}</dt><dd class="mono">{{ chipName }}</dd></div>
         <div><dt>{{ t('manager.flash.flashSize') }}</dt><dd class="mono">{{ flashSize }}</dd></div>
       </dl>
-      <div v-if="flashing || progress" class="prog">
+      <div v-if="flashing" class="prog">
         <div
           class="prog__bar"
           role="progressbar"
@@ -132,8 +144,20 @@ async function onFlash() {
         ><span :style="{ width: progress + '%' }" /></div>
         <span class="prog__label mono">{{ progress }}%</span>
       </div>
+      <p v-if="nvsWarning" class="flash__nvs-warning">{{ nvsWarning }}</p>
     </div>
 
+    <div class="mg-card__actions">
+      <label class="filebtn btn btn--ghost btn--sm">
+        <input type="file" accept=".bin,.zip,application/octet-stream,application/zip" class="visually-hidden" @change="onFile" />
+        {{ t('manager.flash.pick') }}
+      </label>
+      <button class="btn btn--ghost btn--sm" @click="releasesOpen = true">
+        {{ t('manager.flash.browseReleases') }}
+      </button>
+    </div>
+
+    <p v-if="sessionOpen" class="flash__session-hint">{{ t('manager.flash.endsSession') }}</p>
     <ManagerReleasesModal v-model:open="releasesOpen" />
   </div>
 </template>
@@ -153,6 +177,11 @@ async function onFlash() {
 .flash__session-hint {
   font-size: 0.82rem;
   color: var(--ink-3);
+  margin-top: 0.6rem;
+}
+.flash__nvs-warning {
+  font-size: 0.82rem;
+  color: var(--error-deep);
   margin-top: 0.6rem;
 }
 .prog {

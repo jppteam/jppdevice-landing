@@ -194,12 +194,23 @@ export class SmpSession {
   async close() {
     this._closed = true
     this._reading = false
+    const readPromise = this._readPromise
     try {
       if (this.reader) {
         await this.reader.cancel()
       }
     } catch {
       /* already closed */
+    }
+    // Wait for the background read loop to actually exit — it's the one that
+    // releases the lock on port.readable (in its own finally, the only safe
+    // place to do so). Closing the port before that lock is released throws
+    // "Cannot cancel a locked stream", which callers swallow below, leaving
+    // the port silently stuck "opened" for the next open() call.
+    try {
+      if (readPromise) await readPromise
+    } catch {
+      /* ignore */
     }
     this.reader = null
     try {
@@ -231,6 +242,13 @@ export class SmpSession {
         /* stream closed / read error */
       } finally {
         this._reading = false
+        // Safe to release here (and only here): no read() call is in flight,
+        // since we've just exited the loop that owned the only one.
+        try {
+          this.reader.releaseLock()
+        } catch {
+          /* already released */
+        }
         this.reader = null
       }
     })()
