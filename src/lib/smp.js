@@ -16,6 +16,7 @@ export const CMD = {
   GET_INFO: 0x02,
   GET_LRV_DATA: 0x03,
   SET_TIME: 0x04,
+  KEEPALIVE: 0x05,
   FS_LIST_DIR: 0x10,
   FS_MKDIR: 0x11,
   FS_REMOVE: 0x12,
@@ -56,6 +57,24 @@ export const STATUS_NAMES = {
   0x09: 'ERR_OVERFLOW',
   0x0a: 'ERR_APP_RUNNING',
 }
+
+// Device-initiated events reuse the response frame shape, with SEQ pinned to
+// this reserved value — never a valid response SEQ — so a frame carrying it
+// is unambiguously an event rather than a reply to something we sent.
+export const EVENT_SEQ = 0xff
+
+export const EVENT = {
+  SESSION_ENDED: 0x01,
+}
+
+export const EVENT_NAMES = {
+  0x01: 'SESSION_ENDED',
+}
+
+// How often to ping the device with KEEPALIVE while a session is open but
+// otherwise idle (waiting on the user, redrawing the UI). Comfortably under
+// the device's 30s session inactivity timeout.
+const KEEPALIVE_INTERVAL_MS = 15000
 
 const SOF = new Uint8Array([0x01, 0x4a, 0x50, 0x50])
 
@@ -174,11 +193,24 @@ export class SmpSession {
     this._reading = false
     this._closed = false
     this._readPromise = null
+    // Single background frame pump (see _pumpLoop) — the only reader of
+    // _buf's framed contents. cmd() registers a pending waiter here keyed by
+    // SEQ instead of reading frames itself, so a device-initiated event can
+    // be dispatched the instant it arrives, even with no command in flight.
+    this._pending = new Map()
+    this._pumpRunning = false
+    this._pumpPromise = null
+    this._keepaliveTimer = null
+    this._lastActivityAt = 0
     // Fired when a command response comes back ERR_NO_SESSION — the device's
     // authoritative signal that it has closed the session on its own (e.g.
     // cancelled on the OLED, or a device-side timeout), independent of
     // anything the host did.
     this.onSessionLost = null
+    // Fired when the device proactively announces the session ended (the
+    // user held OK) via the SESSION_ENDED event, rather than us finding out
+    // from a failed command or the 30s timeout.
+    this.onSessionEnded = null
   }
 
   // ---- transport primitives ----
@@ -193,8 +225,10 @@ export class SmpSession {
 
   async close() {
     this._closed = true
+    this._stopKeepalive()
     this._reading = false
     const readPromise = this._readPromise
+    const pumpPromise = this._pumpPromise
     try {
       if (this.reader) {
         await this.reader.cancel()
@@ -209,6 +243,12 @@ export class SmpSession {
     // the port silently stuck "opened" for the next open() call.
     try {
       if (readPromise) await readPromise
+    } catch {
+      /* ignore */
+    }
+    // Also wait for the frame pump to notice _closed and stop touching _buf.
+    try {
+      if (pumpPromise) await pumpPromise
     } catch {
       /* ignore */
     }
@@ -321,43 +361,150 @@ export class SmpSession {
     return payload
   }
 
+  // ---- background frame pump ----
+  //
+  // A single continuous loop owns all frame parsing. cmd() sends and then
+  // registers a pending waiter keyed by SEQ instead of reading frames itself,
+  // so:
+  //  - only one reader ever touches _buf's framed contents (concurrent cmd()
+  //    calls no longer race each other for it), and
+  //  - a device-initiated event (SEQ 0xff) is dispatched the moment it
+  //    arrives, whether or not a command happens to be in flight.
+
+  _ensurePump() {
+    if (this._pumpRunning || this._closed) return
+    this._pumpRunning = true
+    this._pumpPromise = this._pumpLoop()
+  }
+
+  async _pumpLoop() {
+    try {
+      // eslint-disable-next-line no-constant-condition
+      while (!this._closed) {
+        let frame
+        try {
+          // Short-ish timeout just to keep re-checking _closed; a real
+          // response/event wakes this up as soon as its SOF lands.
+          frame = await this._readFrame(1000)
+        } catch (e) {
+          continue
+        }
+        if (frame.length < 2) continue
+        const rseq = frame[0]
+        if (rseq === EVENT_SEQ) {
+          this._handleEvent(frame[1], frame.slice(2))
+          continue
+        }
+        const waiter = this._pending.get(rseq)
+        if (waiter) {
+          this._pending.delete(rseq)
+          waiter.resolve(frame)
+        }
+        // else: reply to an earlier, already-abandoned attempt — drop it.
+      }
+    } finally {
+      this._pumpRunning = false
+      const closedErr = new SmpError(0xff, 'connection closed')
+      for (const waiter of this._pending.values()) waiter.reject(closedErr)
+      this._pending.clear()
+    }
+  }
+
+  _awaitResponse(seq, timeoutMs) {
+    return new Promise((resolve, reject) => {
+      const timer = setTimeout(() => {
+        this._pending.delete(seq)
+        reject(new SmpError(0xff, `timeout waiting for cmd response (seq ${seq})`))
+      }, timeoutMs)
+      this._pending.set(seq, {
+        resolve: (frame) => {
+          clearTimeout(timer)
+          resolve(frame)
+        },
+        reject: (err) => {
+          clearTimeout(timer)
+          reject(err)
+        },
+      })
+    })
+  }
+
+  _handleEvent(eventCode, body) {
+    if (eventCode === EVENT.SESSION_ENDED) {
+      this._stopKeepalive()
+      this.log('[event] session ended on device (held OK)')
+      this.onSessionEnded?.()
+      return
+    }
+    this.log(`[event] unknown event 0x${eventCode.toString(16).padStart(2, '0')}`)
+  }
+
+  // ---- session keepalive ----
+  //
+  // While a session is open, ping the device with the no-op KEEPALIVE
+  // command whenever nothing else has reset its inactivity timer recently,
+  // so the UI can sit idle (browsing files, waiting on the user) without the
+  // device dropping the session after 30s.
+
+  _noteActivity() {
+    this._lastActivityAt = Date.now()
+  }
+
+  _startKeepalive() {
+    this._stopKeepalive()
+    this._keepaliveTimer = setInterval(() => {
+      if (this._closed) return
+      if (Date.now() - this._lastActivityAt < KEEPALIVE_INTERVAL_MS) return
+      this.keepalive().catch(() => {
+        // Best-effort. A real failure here (session already gone, transport
+        // hiccup) surfaces through onSessionLost/onSessionEnded instead.
+      })
+    }, KEEPALIVE_INTERVAL_MS)
+  }
+
+  _stopKeepalive() {
+    if (this._keepaliveTimer) {
+      clearInterval(this._keepaliveTimer)
+      this._keepaliveTimer = null
+    }
+  }
+
   // Send a command, wait for the matching response. *retries* applies only to
   // idempotent commands (chunk upload), mirroring jppd_upload.py.
   async cmd(command, body = new Uint8Array(0), timeout = 10000, retries = 0) {
-    const payload = new Uint8Array(3 + body.length)
-    payload[0] = this.seq
-    payload[1] = command
-    payload[2] = 0x00
-    payload.set(body, 3)
-    const lenBytes = u16le(payload.length)
-    const frame = new Uint8Array(8 + payload.length)
-    frame.set(SOF, 0)
-    frame.set(lenBytes, 4)
-    frame.set(payload, 6)
-    const crc = crc16CcittFalse(new Uint8Array([...lenBytes, ...payload]))
-    frame.set(u16le(crc), 6 + payload.length)
+    this._noteActivity()
+    this._ensurePump()
 
     let lastError = null
     for (let attempt = 0; attempt <= retries; attempt++) {
       const seq = this.seq
       this.seq = (this.seq + 1) & 0xff
+
+      const payload = new Uint8Array(3 + body.length)
+      payload[0] = seq
+      payload[1] = command
+      payload[2] = 0x00
+      payload.set(body, 3)
+      const lenBytes = u16le(payload.length)
+      const frame = new Uint8Array(8 + payload.length)
+      frame.set(SOF, 0)
+      frame.set(lenBytes, 4)
+      frame.set(payload, 6)
+      const crc = crc16CcittFalse(new Uint8Array([...lenBytes, ...payload]))
+      frame.set(u16le(crc), 6 + payload.length)
+
       const writer = this.port.writable.getWriter()
       await writer.write(frame).catch(() => {})
       writer.releaseLock()
-      const deadline = Date.now() + timeout
+
       try {
-        while (Date.now() < deadline) {
-          const resp = await this._readFrame(deadline - Date.now())
-          const [rseq, status] = [resp[0], resp[1]]
-          if (rseq === seq) {
-            if (status === STATUS.ERR_NO_SESSION) this.onSessionLost?.()
-            return { status, body: resp.slice(2) }
-          }
-          // Stale reply to an earlier attempt: skip and keep reading.
-        }
+        const resp = await this._awaitResponse(seq, timeout)
+        const status = resp[1]
+        if (status === STATUS.ERR_NO_SESSION) this.onSessionLost?.()
+        return { status, body: resp.slice(2) }
       } catch (e) {
         lastError = e
-        break
+        // Retry with a fresh SEQ on the next iteration, if any remain.
       }
     }
     throw lastError || new SmpError(0xff, `timeout waiting for cmd 0x${command.toString(16)}`)
@@ -378,12 +525,24 @@ export class SmpSession {
       if (status === STATUS.ERR_APP_RUNNING) throw new SmpError(status, 'SESSION_START (app running)')
       throw new SmpError(status, 'SESSION_START')
     }
+    this._startKeepalive()
     return body[0]
   }
 
   async sessionEnd() {
+    this._stopKeepalive()
     const { status } = await this.cmd(CMD.SESSION_END, new Uint8Array(0), 5000)
     this._requireOk(status, 'SESSION_END')
+  }
+
+  // No-op that resets the device's session inactivity timer. Send it during
+  // a stretch where there's nothing else to say — a host that's idling on
+  // its own keepalive timer will call this automatically (see
+  // _startKeepalive); it's also exposed here for callers that want to ping
+  // explicitly.
+  async keepalive() {
+    const { status } = await this.cmd(CMD.KEEPALIVE, new Uint8Array(0), 5000)
+    this._requireOk(status, 'KEEPALIVE')
   }
 
   async getInfo() {

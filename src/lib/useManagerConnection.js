@@ -62,15 +62,20 @@ async function connect(log) {
       sessionInstance = null
     }
     sessionInstance = new SmpSession(state.port.value, appendLog)
-    sessionInstance.onSessionLost = () => {
-      // The device closed the session on its own (cancelled on-device,
-      // device-side timeout, etc.) — the port/transport is still fine, so
-      // only drop the session-level state. openSession() can re-establish a
-      // session over the same still-open port.
+    // The device closed the session on its own (cancelled on-device,
+    // device-side timeout, etc.) — the port/transport is still fine, so only
+    // drop the session-level state. openSession() can re-establish a session
+    // over the same still-open port.
+    const dropSession = () => {
       state.sessionOpen.value = false
       state.info.value = null
       state.lrv.value = null
     }
+    // Learned about it from a failed command (ERR_NO_SESSION) …
+    sessionInstance.onSessionLost = dropSession
+    // … or, on JPPDOS 1.2+, immediately from the device's own SESSION_ENDED
+    // notification — no need to wait for the next command or the timeout.
+    sessionInstance.onSessionEnded = dropSession
     await sessionInstance.open()
     state.session.value = sessionInstance
     state.sessionOpen.value = false
