@@ -1,13 +1,24 @@
 <script setup>
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { useManagerConnection } from '../../lib/useManagerConnection.js'
-import { site } from '../../data/site.js'
+import {
+  parseCertText,
+  verifyCertBytes,
+  verifyResponseBytes,
+  hexToBytes,
+  utf8ToBytes,
+  buildVerifyQuery,
+  computeVerdict,
+  VERDICT,
+} from '../../lib/lrv.js'
 import IconGlyph from '../IconGlyph.vue'
 import Badge from '../Badge.vue'
 
 const { t } = useI18n()
+const router = useRouter()
 const { sessionOpen, info, lrv } = useManagerConnection()
-const verifyReady = site.links.verify !== '#'
 
 function fmt(n) {
   if (n === 0n || n === 0) return '0 B'
@@ -15,14 +26,58 @@ function fmt(n) {
   return `${mb.toFixed(1)} MB`
 }
 
-function parseSerialFromCert(cert) {
-  const serial = cert.match(/serial=(\d+)/)
-  const runSize = cert.match(/run_size=(\d+)/)
+// Runs the same two Ed25519 checks as the /verify page against the identity
+// the connected device just reported, so the badge reflects a real result
+// rather than a static placeholder.
+const verification = computed(() => {
+  const data = lrv.value
+  if (!data) return null
+  const certAttempted = data.cert.length > 0 && data.certSig?.length === 64
+  const certParsed = certAttempted ? parseCertText(data.cert) : null
+  const certValid = certAttempted && verifyCertBytes(utf8ToBytes(data.cert), data.certSig)
+  const responseAttempted = certValid && !!data.challenge && data.respSig?.length === 64
+  const responseValid =
+    responseAttempted && certParsed
+      ? verifyResponseBytes(utf8ToBytes(data.challenge), data.respSig, hexToBytes(certParsed.devicePubkeyHex))
+      : false
+  const verdict = computeVerdict({ certAttempted, certValid, certParsed, responseAttempted, responseValid })
+  return { verdict, certParsed }
+})
 
-  if (!serial || !runSize) return 'N/A'
-
-  return `${serial[1]} / ${runSize[1]}`
+const BADGE_TONE = {
+  [VERDICT.VERIFIED]: 'good',
+  [VERDICT.RESP_FAIL]: 'warn',
+  [VERDICT.CERT_FAIL]: 'bad',
+  [VERDICT.CERT_ONLY]: 'default',
+  [VERDICT.INVALID]: 'default',
 }
+const badgeTone = computed(() => BADGE_TONE[verification.value?.verdict] ?? 'default')
+
+const BADGE_LABEL_KEY = {
+  [VERDICT.VERIFIED]: 'manager.info.lrvBadge.verified',
+  [VERDICT.RESP_FAIL]: 'manager.info.lrvBadge.mismatch',
+  [VERDICT.CERT_FAIL]: 'manager.info.lrvBadge.invalid',
+  [VERDICT.CERT_ONLY]: 'manager.info.lrvBadge.authentic',
+  [VERDICT.INVALID]: 'manager.info.lrvBadge.invalid',
+}
+const badgeLabel = computed(() =>
+  t(verification.value ? BADGE_LABEL_KEY[verification.value.verdict] : 'manager.info.lrvBadge.none')
+)
+
+const lrvSerialLabel = computed(() => {
+  const parsed = verification.value?.certParsed
+  return parsed ? `${parsed.serial} / ${parsed.runSize}` : t('manager.info.lrvNone')
+})
+
+// Deep-links into /verify prefilled with this exact device's live identity —
+// same query scheme the device's own port-3000 redirect uses (spec §4) — so
+// it can be shared/checked outside the Manager page's USB session.
+const verifyHref = computed(() => {
+  const data = lrv.value
+  if (!data) return null
+  const query = buildVerifyQuery(data)
+  return router.resolve({ path: '/verify', query }).href
+})
 </script>
 
 <template>
@@ -54,8 +109,19 @@ function parseSerialFromCert(cert) {
           </div>
           <div class="info-row">
             <span class="info-row__icon"><IconGlyph name="shield" /></span>
-            <span class="info-row__label">{{ t('manager.info.lrv') }} <Badge tone="soon">{{ t('manager.info.lrvHint') }}</Badge></span>
-            <span class="info-row__value mono">{{ lrv ? parseSerialFromCert(lrv.cert) : t('manager.info.lrvNone') }}</span>
+            <span class="info-row__label">{{ t('manager.info.lrv') }}</span>
+            <component
+              :is="verifyHref ? 'a' : 'span'"
+              class="info-row__value lrv-value"
+              :class="{ 'lrv-value--link': !!verifyHref }"
+              :href="verifyHref"
+              :target="verifyHref ? '_blank' : null"
+              :rel="verifyHref ? 'noopener' : null"
+              :title="verifyHref ? t('manager.info.lrvVerifyLink') : null"
+            >
+              <span class="mono">{{ lrvSerialLabel }}</span>
+              <Badge :tone="badgeTone">{{ badgeLabel }}</Badge>
+            </component>
           </div>
         </div>
       </div>
@@ -169,6 +235,17 @@ function parseSerialFromCert(cert) {
   text-align: right;
   font-size: 0.9rem;
 }
+.lrv-value {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  color: inherit;
+  text-decoration: none;
+}
+.lrv-value--link:hover .mono {
+  text-decoration: underline;
+}
 
 @media (max-width: 480px) {
   .info-row {
@@ -178,6 +255,9 @@ function parseSerialFromCert(cert) {
     text-align: left;
     flex-basis: 100%;
     padding-left: 1.65rem;
+  }
+  .lrv-value {
+    justify-content: flex-start;
   }
 }
 </style>

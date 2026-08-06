@@ -51,8 +51,8 @@ export const site = {
     },
     jppgitOrg: 'https://git.nova.tokyo/jppdevice',
     appDocs: 'https://jppdevice.by.m4l3vi.ch/sdk-docs/',
-    manager: '#/manager', // J++Device Manager (Beta)
-    verify: '#', // Limited Run verification page — ships later (roadmap)
+    manager: '/manager', // J++Device Manager (Beta)
+    verify: '/verify', // Limited Run verification page
   },
 }
 

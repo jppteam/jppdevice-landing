@@ -30,6 +30,11 @@
   --error-deep: #b52e2b;
   --error-soft: #fdeceb;
 
+  /* Warning — "technically not broken, but look closer" states */
+  --warning: #b5790a;
+  --warning-deep: #8f5f08;
+  --warning-soft: #fdf1dc;
+
   /* ---- Typography ----
      'Outfit' covers Latin; it has no Cyrillic, so 'Onest' (a close geometric
      match) sits right behind it and serves Cyrillic glyphs per-character. */

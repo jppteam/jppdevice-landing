@@ -130,6 +130,22 @@ defineProps({ name: { type: String, required: true } })
       <path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" />
       <path d="M9 12l2 2 4-4" />
     </template>
+    <!-- shield with a cross (failed verification) -->
+    <template v-else-if="name === 'shield-x'">
+      <path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" />
+      <path d="M9.5 9.5l5 5M14.5 9.5l-5 5" />
+    </template>
+    <!-- alert triangle (warning / can't verify) -->
+    <template v-else-if="name === 'alert'">
+      <path d="M12 4l9.5 16h-19z" />
+      <path d="M12 10v4" />
+      <circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none" />
+    </template>
+    <!-- clock (timestamps / relative time) -->
+    <template v-else-if="name === 'clock'">
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3 2" />
+    </template>
   </svg>
 </template>
 

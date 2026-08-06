@@ -1,6 +1,6 @@
 <script setup>
 defineProps({
-  tone: { type: String, default: 'default' }, // default | soon | yellow | ink
+  tone: { type: String, default: 'default' }, // default | soon | yellow | ink | good | bad | warn
 })
 </script>
 
@@ -41,5 +41,20 @@ defineProps({
   background: var(--yellow-soft);
   border-color: var(--yellow-deep);
   color: #7a6a00;
+}
+.badge--good {
+  background: var(--success-soft);
+  border-color: var(--success-deep);
+  color: var(--success-deep);
+}
+.badge--bad {
+  background: var(--error-soft);
+  border-color: var(--error-deep);
+  color: var(--error-deep);
+}
+.badge--warn {
+  background: var(--warning-soft);
+  border-color: var(--warning-deep);
+  color: var(--warning-deep);
 }
 </style>

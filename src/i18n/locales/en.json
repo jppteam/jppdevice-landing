@@ -214,7 +214,15 @@
       "total": "total",
       "noCard": "SD card unavailable",
       "lrv": "LRV serial number",
-      "lrvHint": "Not verified"
+      "lrvNone": "No identity",
+      "lrvVerifyLink": "Open this identity on the verification page",
+      "lrvBadge": {
+        "none": "No identity",
+        "invalid": "Invalid",
+        "authentic": "Authentic",
+        "mismatch": "Mismatch",
+        "verified": "Verified"
+      }
     },
     "tabs": {
       "files": "Files",
@@ -333,6 +341,75 @@
       "notFound": "Not found on the device.",
       "generic": "Something went wrong: {msg}"
     }
+  },
+  "verify": {
+    "title": "Verify a J++Device",
+    "lead": "Check whether a certificate and signature really came from a genuine, manufacturer-issued J++Device. Everything runs in your browser — nothing you paste here is sent anywhere.",
+    "prefill": {
+      "badCert": "Couldn't decode the certificate from this link — paste it in by hand below."
+    },
+    "form": {
+      "title": "Certificate & signatures",
+      "cert": "Certificate",
+      "certPlaceholder": "serial=7\nrun_size=20\ndevice_type=0\nhwid=AA:BB:CC:DD:EE:FF\ndevice_pubkey=…",
+      "certSig": "Certificate signature",
+      "certSigPlaceholder": "Hex (as shown on-device) or base64url (from a redirect link)",
+      "challenge": "Challenge",
+      "challengePlaceholder": "username|2026-08-06T12:00:00Z",
+      "respSig": "Response signature",
+      "respSigPlaceholder": "Optional — only needed together with the challenge",
+      "responsePartialHint": "Provide both the challenge and the response signature to check liveness — one alone isn't enough.",
+      "submit": "Verify",
+      "reset": "Clear"
+    },
+    "result": {
+      "invalid": {
+        "title": "Can't verify",
+        "body": "Invalid or incomplete input — a certificate and its signature are both required."
+      },
+      "certFail": {
+        "title": "Not a genuine J++Device certificate",
+        "body": "This signature doesn't match the manufacturer key. Make sure you copied the exact certificate text, with no missing or extra lines."
+      },
+      "certOnly": {
+        "title": "Certificate is authentic",
+        "body": "This certificate was signed by the real manufacturer key. No live response was supplied, so possession of the device's private key hasn't been checked."
+      },
+      "respFail": {
+        "title": "Certificate is genuine, but the response doesn't match",
+        "body": "The certificate signature checks out, but this response signature doesn't match it. This may be a corrupted or tampered link — it is not a live response from this unit."
+      },
+      "verified": {
+        "title": "Verified",
+        "body": "Genuine, manufacturer-issued unit — and it signed this exact challenge."
+      },
+      "verifiedBadClock": {
+        "title": "Verified, but the device's clock looks wrong",
+        "body": "The certificate and response signatures both check out — this is a genuine unit. But the signed timestamp predates the device's own existence, so its clock is misconfigured or never synced. Treat the \"signed at\" time as meaningless until that's fixed."
+      },
+      "unparseable": "The signature is valid, but the certificate text isn't in the expected format.",
+      "respFailChallenge": "Response signature checked against: {challenge}"
+    },
+    "fields": {
+      "serial": "Serial",
+      "unitOf": "Unit {n} of {total}",
+      "deviceType": "Device type",
+      "deviceTypeLimited": "Limited Run",
+      "deviceTypeOther": "Type {n}",
+      "advanced": "Advanced details",
+      "hwid": "HWID",
+      "devicePubkey": "Device public key"
+    },
+    "challenge": {
+      "verifiedAs": "Verified device owner: {user}",
+      "noUsername": "(no username set)",
+      "clockUnavailable": "Device clock unavailable at signing time",
+      "signedAt": "Signed at {time} ({rel})",
+      "implausibleYear": "This is earlier than {year}, before J++Device existed — the device's clock is wrong.",
+      "futureWarning": "This timestamp is in the future relative to your clock — possible clock skew, or an unusual link."
+    },
+    "livenessCaveat": "This proves possession of the device's private key at the moment it was signed — not that the device is online right now. A captured link can still verify successfully days later.",
+    "privacyNote": "All checks run locally in your browser. Nothing you paste or that arrives via a link is sent to any server."
   },
   "oled": {
     "ariaLabel": "A 128×64 monochrome OLED running the J++Device demoscene."

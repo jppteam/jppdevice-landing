@@ -7,8 +7,8 @@ import { site } from '../../data/site.js'
 
 const { t } = useI18n()
 
-// The Limited Run verification page ships later — render a non-clickable "soon"
-// control until site.links.verify points somewhere real.
+// Falls back to a non-clickable "soon" control if site.links.verify is ever
+// unset — the flag stays in case that placeholder pattern is needed again.
 const verifyReady = site.links.verify && site.links.verify !== '#'
 </script>
 
@@ -57,7 +57,7 @@ const verifyReady = site.links.verify && site.links.verify !== '#'
           >
             <IconGlyph name="browser" />
             {{ t('getOne.verifyCta') }}
-            <Badge tone="soon">{{ t('common.soon') }}</Badge>
+            <Badge v-if="!verifyReady" tone="soon">{{ t('common.soon') }}</Badge>
           </component>
         </div>
       </div>

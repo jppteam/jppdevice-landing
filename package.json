@@ -6,14 +6,16 @@
   "description": "Landing page for the J++Device — a tiny open pocket handheld.",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run test:lrv && vite build",
     "preview": "vite preview",
+    "test:lrv": "node scripts/selftest-lrv.mjs",
     "trace-logo": "node scripts/trace-logo.mjs"
   },
   "dependencies": {
     "@fontsource/onest": "^5.2.11",
     "esptool-js": "^0.6.0",
     "fflate": "^0.8.3",
+    "tweetnacl": "^1.0.3",
     "vue": "^3.5.13",
     "vue-i18n": "^11.4.6",
     "vue-router": "^4.6.4"
