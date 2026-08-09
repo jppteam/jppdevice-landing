@@ -200,6 +200,12 @@ export class SmpSession {
     this._pending = new Map()
     this._pumpRunning = false
     this._pumpPromise = null
+    // Raw serial monitor loop (see startMonitor) — dumps whatever lands in
+    // _buf straight to the log as plain text. Only runs before any SMP
+    // command has been sent, so it never fights the frame pump over _buf;
+    // cmd() stops and awaits it before touching the wire.
+    this._monitorRunning = false
+    this._monitorPromise = null
     this._keepaliveTimer = null
     this._lastActivityAt = 0
     // Fired when a command response comes back ERR_NO_SESSION — the device's
@@ -227,8 +233,10 @@ export class SmpSession {
     this._closed = true
     this._stopKeepalive()
     this._reading = false
+    this._monitorRunning = false
     const readPromise = this._readPromise
     const pumpPromise = this._pumpPromise
+    const monitorPromise = this._monitorPromise
     try {
       if (this.reader) {
         await this.reader.cancel()
@@ -249,6 +257,11 @@ export class SmpSession {
     // Also wait for the frame pump to notice _closed and stop touching _buf.
     try {
       if (pumpPromise) await pumpPromise
+    } catch {
+      /* ignore */
+    }
+    try {
+      if (monitorPromise) await monitorPromise
     } catch {
       /* ignore */
     }
@@ -292,6 +305,46 @@ export class SmpSession {
         this.reader = null
       }
     })()
+  }
+
+  // ---- raw serial monitor ----
+  //
+  // Lets the "connection log" double as a plain serial monitor as soon as a
+  // port is open, before any JPPD-SMP command has been sent (and thus before
+  // there's any framed traffic for _pumpLoop to parse). Simply drains _buf on
+  // a timer and logs it as text. Stops the moment cmd() is about to write to
+  // the wire, so it never races the frame pump for _buf.
+
+  startMonitor() {
+    if (this._monitorRunning || this._pumpRunning || this._closed) return
+    this._monitorRunning = true
+    this._monitorPromise = this._monitorLoop()
+  }
+
+  async _monitorLoop() {
+    try {
+      if (!this._reading) await this._startReader()
+      while (this._monitorRunning && !this._closed) {
+        if (this._buf.length > 0) {
+          const text = _decodeNoise(this._buf)
+          this._buf = new Uint8Array(0)
+          if (text) this.log(text)
+        }
+        await sleep(120)
+      }
+    } finally {
+      this._monitorRunning = false
+    }
+  }
+
+  async _stopMonitorAndWait() {
+    if (!this._monitorRunning) return
+    this._monitorRunning = false
+    try {
+      await this._monitorPromise
+    } catch {
+      /* ignore */
+    }
   }
 
   // Block until the buffer holds at least *count* bytes (or timeout), then
@@ -473,6 +526,7 @@ export class SmpSession {
   // idempotent commands (chunk upload), mirroring jppd_upload.py.
   async cmd(command, body = new Uint8Array(0), timeout = 10000, retries = 0) {
     this._noteActivity()
+    await this._stopMonitorAndWait()
     this._ensurePump()
 
     let lastError = null

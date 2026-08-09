@@ -8,6 +8,11 @@ const { t } = useI18n()
 const { logLines, clearLog } = useManagerConnection()
 const refEl = ref(null)
 
+defineProps({
+  closable: { type: Boolean, default: false },
+})
+defineEmits(['close'])
+
 function scrollToBottom() {
   requestAnimationFrame(() => {
     if (refEl.value) refEl.value.scrollTop = refEl.value.scrollHeight
@@ -39,6 +44,13 @@ function downloadLog() {
           {{ t('manager.console.download') }}
         </button>
         <button class="con__btn btn btn--ghost btn--sm" @click="clearLog">{{ t('manager.console.clear') }}</button>
+        <button
+          v-if="closable"
+          class="con__close"
+          type="button"
+          :aria-label="t('manager.log.close')"
+          @click="$emit('close')"
+        >&times;</button>
       </div>
     </div>
     <div ref="refEl" class="con__body" tabindex="0" aria-live="polite">
@@ -97,6 +109,22 @@ function downloadLog() {
   height: 0.9em;
 }
 .con__btn:hover {
+  background: var(--yellow);
+  color: var(--ink);
+}
+.con__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  font-size: 1.15rem;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  transition: background 0.15s, color 0.15s;
+}
+.con__close:hover {
   background: var(--yellow);
   color: var(--ink);
 }

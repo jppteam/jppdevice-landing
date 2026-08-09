@@ -13,7 +13,7 @@ import ManagerLogModal from '../components/manager/ManagerLogModal.vue'
 import { useManagerConnection } from '../lib/useManagerConnection.js'
 
 const { t } = useI18n()
-const { sessionOpen, supported } = useManagerConnection()
+const { sessionOpen, supported, port, connecting, connect, log, errorMessage } = useManagerConnection()
 
 // Files and Apps talk over a JPPD-SMP session, so their tabs only exist once
 // one is open. Connect and Flash are their own standalone cards above.
@@ -29,6 +29,20 @@ const logOpen = ref(false)
 watch(sessionOpen, (open) => {
   if (!open) logOpen.value = false
 })
+
+// "Show connection log" doubles as a serial monitor: if no port has been
+// picked yet, requesting the log first prompts the browser's port picker
+// (a user gesture is required), then opens with the raw serial stream
+// flowing in — see SmpSession.startMonitor.
+async function onShowLog() {
+  logOpen.value = true
+  if (port.value || connecting.value) return
+  try {
+    await connect(log)
+  } catch (e) {
+    log(errorMessage(e, t))
+  }
+}
 
 function onKeydown(e) {
   const ids = tabs.map((tab) => tab.id)
@@ -63,9 +77,10 @@ function onKeydown(e) {
         </SectionHeading>
 
         <div class="mpage__logbar">
-          <button class="btn btn--ghost btn--sm" @click="logOpen = true">
+          <button class="btn btn--ghost btn--sm" :disabled="connecting" @click="onShowLog">
             <IconGlyph name="code" />
-            {{ t('manager.log.show') }}
+            <span v-if="connecting">{{ t('manager.connectCard.connecting') }}</span>
+            <span v-else>{{ t('manager.log.show') }}</span>
           </button>
         </div>
 

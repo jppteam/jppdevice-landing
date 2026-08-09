@@ -80,6 +80,9 @@ async function connect(log) {
     state.session.value = sessionInstance
     state.sessionOpen.value = false
     state.info.value = null
+    // Act as a plain serial monitor until the first real JPPD-SMP command is
+    // sent (openSession, etc.), which stops it and takes over the wire.
+    sessionInstance.startMonitor()
     return state.session.value
   } finally {
     state.connecting.value = false
@@ -132,6 +135,7 @@ async function endSession() {
   state.sessionOpen.value = false
   state.info.value = null
   state.lrv.value = null
+  state.port.value = null
   sessionInstance = null
   portKept = null
 }
