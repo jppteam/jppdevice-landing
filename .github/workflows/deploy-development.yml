@@ -8,7 +8,7 @@ name: Deploy to Yandex Cloud S3
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   workflow_dispatch:
 
 # Only one development deploy at a time; cancel an in-flight run when a newer
