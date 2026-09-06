@@ -1,6 +1,7 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
 import IconGlyph from '../IconGlyph.vue'
+import { useLrvDevice } from '../../lib/useLrvDevice.js'
 
 const cert = defineModel('cert', { type: String, required: true })
 const certSig = defineModel('certSig', { type: String, required: true })
@@ -11,9 +12,24 @@ defineProps({
   responsePartial: { type: Boolean, default: false },
   canReset: { type: Boolean, default: false },
 })
-defineEmits(['submit', 'reset'])
+const emit = defineEmits(['submit', 'reset'])
 
 const { t } = useI18n()
+
+// Reading the identity straight off a plugged-in device, for browsers that
+// have Web Serial. The button hides itself everywhere else, so nothing on the
+// page depends on it — the fields stay hand-fillable exactly as before.
+const { supported: deviceSupported, busy: deviceBusy, error: deviceError, read: readDevice } = useLrvDevice()
+
+async function fillFromDevice() {
+  const data = await readDevice()
+  if (!data) return
+  cert.value = data.cert
+  certSig.value = data.certSig
+  challenge.value = data.challenge
+  respSig.value = data.respSig
+  emit('submit')
+}
 
 // Every field shares the same paste-friendly attributes and its label,
 // placeholder and error copy all hang off one `verify.form.*` key — only the
@@ -67,8 +83,25 @@ const FIELDS = [
       <IconGlyph name="alert" /> {{ t('verify.form.responsePartialHint') }}
     </p>
 
+    <p v-if="deviceBusy" class="field-hint field-hint--device">
+      <IconGlyph name="usb" /> {{ t('verify.device.consent') }}
+    </p>
+    <p v-else-if="deviceError" class="field-error">
+      <IconGlyph name="alert" /> {{ t(`verify.device.errors.${deviceError}`) }}
+    </p>
+
     <div class="mg-card__actions">
       <button type="submit" class="btn btn--yellow">{{ t('verify.form.submit') }}</button>
+      <button
+        v-if="deviceSupported"
+        type="button"
+        class="btn btn--ghost"
+        :disabled="deviceBusy"
+        @click="fillFromDevice"
+      >
+        <IconGlyph name="usb" />
+        {{ deviceBusy ? t('verify.device.reading') : t('verify.device.fill') }}
+      </button>
     </div>
   </form>
 </template>
@@ -108,12 +141,19 @@ const FIELDS = [
   outline: none;
   border-color: var(--ink);
 }
-.field-hint {
+.field-hint,
+.field-error {
   display: flex;
   align-items: center;
   gap: 0.4em;
   font-size: 0.82rem;
   color: var(--warning-deep);
   margin: -0.5rem 0 1rem;
+}
+.field-hint--device {
+  color: var(--ink-3);
+}
+.field-error {
+  color: var(--error-deep);
 }
 </style>

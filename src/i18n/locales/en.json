@@ -360,6 +360,18 @@
       "responsePartialHint": "Provide both the challenge and the response signature to check liveness — one alone isn't enough.",
       "submit": "Verify"
     },
+    "device": {
+      "fill": "Read from device",
+      "reading": "Reading…",
+      "consent": "Waiting for consent on the device — press Allow…",
+      "errors": {
+        "denied": "Consent was denied on the device.",
+        "appRunning": "An app is currently running — exit to the launcher first.",
+        "busy": "The device is busy.",
+        "noIdentity": "This device doesn't carry an LRV certificate.",
+        "generic": "Couldn't read the device. Check the USB-C connection and try again."
+      }
+    },
     "certsum": {
       "title": "certificate",
       "certRaw": "Certificate text entered ({chars} characters)",
